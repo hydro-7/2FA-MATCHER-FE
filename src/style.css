@@ -7,6 +7,15 @@ h1 { margin: 0; font-size: clamp(4rem, 12vw, 7rem); line-height: .95; }
 .lede { margin: 24px 0 48px; color: #aebbd0; font-size: 1.25rem; }
 section { padding: 28px; border: 1px solid #29415f; border-radius: 20px; background: rgba(10, 24, 43, .78); box-shadow: 0 28px 90px rgba(0,0,0,.3); }
 h2 { margin-top: 0; }
-.status { display: flex; justify-content: space-between; padding: 14px 0; border-top: 1px solid #20344e; text-transform: capitalize; }
-.connected { color: #65d6a6; }
-.unavailable, .error { color: #ff9d9d; }
+form { display: grid; gap: 18px; }
+label { display: grid; gap: 8px; color: #cbd7e9; font-weight: 600; }
+input, textarea { width: 100%; padding: 12px 14px; border: 1px solid #38516f; border-radius: 10px; color: #eaf0ff; background: #0a182b; font: inherit; }
+textarea { min-height: 90px; resize: vertical; }
+button { width: fit-content; padding: 11px 18px; border: 0; border-radius: 10px; color: #07111f; background: #76a9fa; font: inherit; font-weight: 700; cursor: pointer; }
+button:hover { filter: brightness(1.08); }
+.message { color: #aebbd0; }
+.items { display: grid; gap: 12px; margin-top: 26px; }
+article { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px; border: 1px solid #29415f; border-radius: 12px; }
+article h3, article p { margin: 0; }
+article p { margin-top: 5px; color: #aebbd0; }
+.delete { color: #ffdada; background: #612c39; }
