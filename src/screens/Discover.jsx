@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { ArrowRight, CalendarDays, Filter, Layers, List, MapPin, Moon, Search, Users, Zap } from "lucide-react";
+import { ArrowRight, CalendarDays, CircleAlert, Filter, Layers, List, MapPin, Sparkles, Wand2, Moon, Search, Users, Zap } from "lucide-react";
 import { BUDGET_SLIDER, CITY_PHOTOS, DISCOVER_SORTS, HERO_PHOTO, SEARCH_DEBOUNCE_MS } from "../constants/app";
 import { ROUTES } from "../config/routes";
 import { formatDates, formatMoney, labelOf, nightsBetween } from "../lib/format";
@@ -260,19 +260,7 @@ function DiscoverBody({ meta }) {
                 matches.map((match) => <MatchCard key={match.groupId} match={match} searchId={result.searchId} interestLabel={interestLabel} />)
               )}
               {result?.nearMisses.length > 0 && (
-                <details className="near-miss">
-                  <summary>
-                    {result.nearMisses.length} almost-matching {result.nearMisses.length === 1 ? "group" : "groups"}: see what to change
-                  </summary>
-                  {result.nearMisses.map((group) => (
-                    <article key={group.groupId}>
-                      <strong>{group.name}</strong>
-                      {group.suggestions.map((item) => (
-                        <p key={item.rule}>{item.suggestion}</p>
-                      ))}
-                    </article>
-                  ))}
-                </details>
+                <NearMisses groups={result.nearMisses} filters={filters} onFix={set} />
               )}
             </div>
           )}
@@ -331,5 +319,59 @@ function MatchCard({ match, searchId, interestLabel }) {
         </Link>
       </div>
     </article>
+  );
+}
+
+// One-tap fixes for rules the seeker controls; gender and group size can only be explained.
+function fixFor(rule, group, filters) {
+  if (rule === "DATES_OVERLAP") return { label: "Use their dates", patch: { checkIn: group.checkIn, checkOut: group.checkOut } };
+  if (rule === "BUDGET") return { label: `Set budget to ${formatMoney(group.budgetInr)}`, patch: { budgetInr: String(group.budgetInr) } };
+  if (rule === "SHARED_INTERESTS" && group.interests)
+    return { label: "Add their interests", patch: { interests: [...new Set([...filters.interests, ...group.interests])] } };
+  return null;
+}
+
+function NearMisses({ groups, filters, onFix }) {
+  return (
+    <section className="near-miss">
+      <header>
+        <span className="near-icon">
+          <Sparkles size={22} />
+        </span>
+        <div>
+          <h3>
+            {groups.length} more {groups.length === 1 ? "group is" : "groups are"} one change away
+          </h3>
+          <p>Each of these fails just one rule. Fix it and they move into your matches.</p>
+        </div>
+      </header>
+      <div className="near-grid">
+        {groups.map((group) =>
+          group.suggestions.map((item) => {
+            const rule = group.rules.find((r) => r.id === item.rule);
+            const fix = fixFor(item.rule, group, filters);
+            return (
+              <article key={`${group.groupId}-${item.rule}`} className="near-card">
+                <div className="near-photo" style={{ backgroundImage: `url("${CITY_PHOTOS[group.city] ?? HERO_PHOTO.SRC}")` }} />
+                <div className="near-body">
+                  <Link to={ROUTES.GROUP(group.groupId)}>{group.name}</Link>
+                  <small>
+                    {formatDates(group.checkIn, group.checkOut)} · {formatMoney(group.budgetInr)}
+                  </small>
+                  <span className="near-reason">
+                    <CircleAlert size={15} /> {rule?.label ?? item.rule}: {fix ? item.suggestion : (rule?.detail ?? item.suggestion)}
+                  </span>
+                </div>
+                {fix && (
+                  <button type="button" className="fix-btn" onClick={() => onFix(fix.patch)}>
+                    <Wand2 size={16} /> {fix.label}
+                  </button>
+                )}
+              </article>
+            );
+          }),
+        )}
+      </div>
+    </section>
   );
 }

@@ -1,23 +1,41 @@
 import { useRef, useState } from "react";
 import { Empty } from "./ui";
 
+const EXIT_MS = 260;
+
 export function SwipeDeck({ matches, renderCard, onRequest, busy }) {
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0);
+  const [exit, setExit] = useState("");
+  const [dragging, setDragging] = useState(false);
   const start = useRef(null);
   const match = matches[index];
   const canRequest = match && !match.myRequestStatus && match.seatsLeft > 0;
+
+  // Fly the card out, then skip or request and show the next card.
+  function leave(direction) {
+    if (exit || busy || (direction === "right" && !canRequest)) return;
+    setExit(direction);
+    setTimeout(() => {
+      if (direction === "right") onRequest(match);
+      setIndex((value) => value + 1);
+      setExit("");
+      setDrag(0);
+    }, EXIT_MS);
+  }
 
   function release(event) {
     if (start.current) {
       const dx = event.clientX - start.current.x;
       const dy = event.clientY - start.current.y;
-      if (!busy && Math.abs(dx) > 90 && Math.abs(dx) > Math.abs(dy)) {
-        if (dx < 0) setIndex((value) => value + 1);
-        else if (canRequest) onRequest(match);
+      if (Math.abs(dx) > 90 && Math.abs(dx) > Math.abs(dy) && (dx < 0 || canRequest)) {
+        start.current = null;
+        setDragging(false);
+        return leave(dx < 0 ? "left" : "right");
       }
     }
     start.current = null;
+    setDragging(false);
     setDrag(0);
   }
 
@@ -41,7 +59,9 @@ export function SwipeDeck({ matches, renderCard, onRequest, busy }) {
           event.button !== 0
         )
           return;
+        if (exit) return;
         start.current = { x: event.clientX, y: event.clientY };
+        setDragging(true);
         event.currentTarget.setPointerCapture(event.pointerId);
       }}
       onPointerMove={(event) => {
@@ -54,16 +74,18 @@ export function SwipeDeck({ matches, renderCard, onRequest, busy }) {
       onPointerUp={release}
       onPointerCancel={() => {
         start.current = null;
+        setDragging(false);
         setDrag(0);
       }}
     >
       <div
-        className="swipe-card"
-        style={{ transform: `translateX(${drag}px) rotate(${drag / 25}deg)` }}
+        key={index}
+        className={`swipe-card ${dragging ? "dragging" : ""} ${exit ? `exit-${exit}` : ""}`}
+        style={exit ? undefined : { transform: `translateX(${drag}px) rotate(${drag / 25}deg)` }}
       >
-        {Math.abs(drag) > 25 && (
-          <span className={`swipe-stamp ${drag > 0 ? "yes" : "no"}`}>
-            {drag > 0 ? (canRequest ? "LET’S GO" : "REQUEST EXISTS") : "PASS"}
+        {(Math.abs(drag) > 25 || exit) && (
+          <span className={`swipe-stamp ${drag > 0 || exit === "right" ? "yes" : "no"}`}>
+            {drag > 0 || exit === "right" ? (canRequest ? "LET’S GO" : "REQUEST EXISTS") : "PASS"}
           </span>
         )}
         {renderCard(match)}
@@ -71,12 +93,12 @@ export function SwipeDeck({ matches, renderCard, onRequest, busy }) {
       <div className="swipe-actions">
         <button
           className="secondary"
-          disabled={busy}
-          onClick={() => setIndex((value) => value + 1)}
+          disabled={busy || Boolean(exit)}
+          onClick={() => leave("left")}
         >
           × Skip
         </button>
-        <button disabled={busy || !canRequest} onClick={() => onRequest(match)}>
+        <button disabled={busy || !canRequest || Boolean(exit)} onClick={() => leave("right")}>
           {busy
             ? "Sending…"
             : match.myRequestStatus
