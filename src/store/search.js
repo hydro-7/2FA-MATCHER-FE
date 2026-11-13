@@ -13,16 +13,42 @@ export const useSearch = create(
       filters: NO_FILTERS,
       result: null,
       view: { sort: "", mode: "list" },
-      setView: (patch) => set((state) => ({ view: { ...state.view, ...patch } })),
-      setResult: (travellerId, criteria, filters, result) => set({ travellerId, criteria, filters, result }),
-      clear: () => set({ travellerId: "", criteria: null, filters: NO_FILTERS, result: null }),
-      markRequested: (groupId) =>
-        set((state) => ({
-          result: {
-            ...state.result,
-            matches: state.result.matches.map((match) => (match.groupId === groupId ? { ...match, myRequestStatus: "PENDING" } : match)),
+      setView: (patch) =>
+        set((state) => ({ view: { ...state.view, ...patch } })),
+      beginSearch: (travellerId, criteria) =>
+        set({
+          travellerId,
+          criteria,
+          result: null,
+          filters: {
+            sharedInterests: criteria.sharedInterests ?? [],
+            genderMix: criteria.genderMix ?? "",
           },
-        })),
+        }),
+      setResult: (travellerId, criteria, filters, result) =>
+        set({ travellerId, criteria, filters, result }),
+      clear: () =>
+        set({
+          travellerId: "",
+          criteria: null,
+          filters: NO_FILTERS,
+          result: null,
+        }),
+      markRequested: (groupId, searchId) =>
+        set((state) =>
+          !state.result || (searchId && state.result.searchId !== searchId)
+            ? {}
+            : {
+                result: {
+                  ...state.result,
+                  matches: state.result.matches.map((match) =>
+                    match.groupId === groupId
+                      ? { ...match, myRequestStatus: "PENDING" }
+                      : match,
+                  ),
+                },
+              },
+        ),
     }),
     { name: STORAGE_KEYS.SEARCH },
   ),

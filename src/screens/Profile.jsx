@@ -104,7 +104,7 @@ function SignUpWizard({ meta }) {
   const reason = from && (SIGN_UP_REASONS[from.split("?")[0]] ?? "continue");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const minInterests = meta.matchRules.MIN_SHARED_INTERESTS;
+  const minInterests = 1;
   const change = (key) => (event) => setForm({ ...form, [key]: event.target.value });
   const toggleInterest = (id) =>
     setForm({ ...form, interests: form.interests.includes(id) ? form.interests.filter((value) => value !== id) : [...form.interests, id] });
@@ -113,7 +113,7 @@ function SignUpWizard({ meta }) {
     event.preventDefault();
     setError("");
     if (step === 0 && !form.gender) return setError("Choose your gender.");
-    if (step === 1 && form.interests.length < minInterests) return setError(`Pick at least ${minInterests} interests.`);
+    if (step === 1 && form.interests.length < minInterests) return setError("Pick at least one interest.");
     if (step === 2 && !form.genderPreference) return setError("Choose who you want to travel with.");
     if (step < STEPS.length - 1) return setStep(step + 1);
     setBusy(true);
@@ -218,7 +218,7 @@ function SignUpWizard({ meta }) {
             </span>{" "}
             while travelling?
           </h1>
-          <p className="wizard-sub">Select at least {minInterests} interests. This helps us match you with the right groups.</p>
+          <p className="wizard-sub">Select at least one interest. A group match needs {meta.matchRules.MIN_SHARED_INTERESTS} shared interests with its creator.</p>
           <div className="interest-grid">
             {meta.interests.map((interest) => {
               const Icon = INTEREST_ICONS[interest.id] ?? FALLBACK_ICON;
@@ -265,8 +265,8 @@ function SignUpWizard({ meta }) {
                   ₹
                   <input
                     type="number"
-                    min={BUDGET_SLIDER.MIN}
-                    step={BUDGET_SLIDER.STEP}
+                    min="1"
+                    step="1"
                     placeholder="60000"
                     value={form.budget}
                     onChange={(e) => setForm({ ...form, budget: e.target.value })}

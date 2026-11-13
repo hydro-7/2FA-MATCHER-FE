@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "node --test src/lib/__tests__/searchCriteria.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
