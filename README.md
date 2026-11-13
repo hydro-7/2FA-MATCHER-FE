@@ -1,82 +1,20 @@
-# Travel Together: frontend
+# Travel Together — frontend
 
-React client for the Group Travel Matcher. Every screen reads from the backend API. Nothing is mocked.
+React app for travel groups, shared stays, cost splits, friends, maps and chat. Bookings are demo confirmations, without payments.
 
-React 19, Vite, React Router, zustand, Leaflet.
+Needs Node.js 24 LTS and Git. First run the [backend](https://github.com/Ajaybalajiprasad/2FA-MATCHER-BE) on port 8000 in a separate terminal.
+```sh
+git clone https://github.com/hydro-7/2FA-MATCHER-FE.git
+cd 2FA-MATCHER-FE
+npm install
+npm run dev
+```
 
-## Run
+- Open [http://localhost:5173](http://localhost:5173), then choose **Sign up** or **Sign in**. Leave both server terminals open.
+- No frontend `.env` is needed: Vite forwards `/api` and `/images` to `http://localhost:8000`.
+- For another backend address, copy `.env.example` to `.env`, change `VITE_BACKEND_ORIGIN`, then restart `npm run dev`.
+- Demo login: `t-001@demo.travel` / `demo1234` (unless the backend's `DEMO_PASSWORD` was changed).
+- Use a private browser window for a second traveller so the two logins stay separate.
+- Checks: `npm test`. Build: `npm run build`. Use `npm run dev` for the connected local demo.
 
-Needs Node 22 or newer, pnpm, and the backend running on `http://localhost:8000`. Start the backend first and wait for its `Server running` line.
-
-    pnpm install
-    pnpm dev
-
-Open http://localhost:5173. Sign in and sign up share one popup, opened from the header or by any page that needs an account. Sign up, or sign in as a seeded traveller: `t-001@demo.travel` with the backend's `DEMO_PASSWORD` (default `demo1234`).
-
-No `.env` is needed for local work. To change the defaults, copy `.env.example` to `.env`:
-
-| Variable | Meaning |
-| --- | --- |
-| `VITE_BACKEND_ORIGIN` | Where the dev server proxies `/api` and `/images`. Default `http://localhost:8000`. |
-| `VITE_API_URL` | Call the API directly instead of through the proxy. |
-| `VITE_PORT` | Dev server port. Default `5173`. |
-
-## Commands
-
-| Command | Does |
-| --- | --- |
-| `pnpm dev` | Dev server with hot reload. |
-| `pnpm build` | Production build into `dist/`. |
-| `pnpm preview` | Serve `dist/` locally. |
-
-## Layout
-
-    src/config      env, API endpoints, page URLs
-    src/constants   settings and labels
-    src/lib         http client, formatting
-    src/store       zustand: session (token), search, drafts, theme, toasts
-    src/services    one per backend domain
-    src/hooks       useResource, useMeta
-    src/components  shared UI
-    src/screens     one per route, group tabs in screens/group
-
-Screens call services. Services call `lib/http.js`. Only `lib/http.js` uses `fetch`, and it adds the `Authorization: Bearer` header.
-
-## Routes
-
-| Path | Screen |
-| --- | --- |
-| `/` | Home |
-| `/profile` | Your profile |
-| `/discover` | Search, matches, near misses |
-| `/groups/new` | Create a trip |
-| `/trips` | Your groups and sent requests |
-| `/groups/:id` | Trip overview and join request |
-| `/groups/:id/members` | Members |
-| `/groups/:id/stays` | Hotels, cost per person, booking |
-| `/groups/:id/chat` | Group chat |
-| `/groups/:id/requests` | Approve or decline, owner only |
-| `/travellers/:id` | A traveller's profile |
-
-## Problems
-
-- `http proxy error ... ECONNREFUSED 127.0.0.1:8000`: the backend is not running. Start it, then reload.
-- Signed out on every request: the token expired (7 days) or the backend's `AUTH_SECRET` changed. Sign in again.
-- A `companion.bundle.js` error in the console comes from a browser extension, not this app.
-
-## Limits
-
-- Profiles cannot be edited. The API has no update route.
-- No password reset.
-- Chat polls every few seconds.
-
-## Discovery acceptance checks
-
-Discovery includes editable home city (not a compatibility rule), exact positive
-whole-rupee budget input, required shared-interest filters, owner names and current
-member counts in list/swipe cards. Invalid or failed searches clear old results;
-late responses cannot overwrite newer criteria. Lists show eight matches per page.
-The API returns at most 50 matches and 50 near misses with full filtered totals;
-near-miss suggestions are revealed six at a time. One interest is valid input,
-while an actual match still needs two shared interests. Run `npm test` and
-`npm run build` to check the frontend. Use separate browser sessions for two people.
+Code flow: `src/screens` → `src/services` → `src/lib/http.js` → backend; `src/store` holds UI state. Maps and remote photos need internet.
