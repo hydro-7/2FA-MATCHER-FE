@@ -6,7 +6,7 @@ main:has(> .landing) {
 .landing {
   overflow: hidden;
   background:
-    radial-gradient(1200px 400px at 50% 100%, #e7eefb 0%, transparent 70%),
+    radial-gradient(1200px 400px at 50% 100%, var(--glow) 0%, transparent 70%),
     var(--page);
 }
 
@@ -31,7 +31,7 @@ main:has(> .landing) {
   gap: 10px;
   padding: 12px 20px;
   border-radius: 999px;
-  background: #eef1f7;
+  background: var(--subtle);
   color: var(--ink);
   font-size: 16px;
   font-weight: 700;
@@ -126,7 +126,7 @@ main:has(> .landing) {
 
 .cta-ghost {
   border: 1.5px solid var(--ring);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
 }
 
@@ -196,7 +196,7 @@ main:has(> .landing) {
   gap: 20px;
   padding: 18px;
   border-radius: 24px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 24px 60px rgb(11 19 37 / 12%);
 }
 
@@ -223,7 +223,7 @@ main:has(> .landing) {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: #f1f4fa;
+  background: var(--subtle);
 }
 
 .field-body {
@@ -342,7 +342,7 @@ main:has(> .landing) {
   padding: 26px 30px;
   border: 1px solid var(--ring);
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 6px 20px rgb(11 19 37 / 6%);
   text-align: left;
 }
@@ -378,18 +378,18 @@ main:has(> .landing) {
 }
 
 .journey-icon.blue {
-  background: #e3efff;
-  color: #1d6bf3;
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .journey-icon.purple {
-  background: #efe8ff;
+  background: color-mix(in srgb, #7c3aed 16%, var(--surface));
   color: #7c3aed;
 }
 
 .journey-icon.green {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--green-soft);
+  color: var(--green-ink);
 }
 
 @media (max-width: 1100px) {

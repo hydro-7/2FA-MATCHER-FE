@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
-import { Bell, CalendarDays, House, LogIn, RefreshCw, Search, SquarePlus, UserRound, Users } from "lucide-react";
+import { Bell, Moon, Sun, CalendarDays, House, LogIn, RefreshCw, Search, SquarePlus, UserRound, Users } from "lucide-react";
 import { CITY_PHOTO_CREDITS, HERO_PHOTO, NAV_ITEMS, PHOTO_CREDITS_PATH } from "../../constants/app";
 import { ROUTES } from "../../config/routes";
 import { assetUrl } from "../../lib/format";
@@ -8,6 +8,7 @@ import { useResource } from "../../hooks/useResource";
 import { groupService } from "../../services/groupService";
 import { travellerService } from "../../services/travellerService";
 import { useSession } from "../../store/session";
+import { useTheme } from "../../store/theme";
 import { useToasts } from "../../store/toast";
 import { IdentityModal } from "../IdentityModal";
 
@@ -125,6 +126,7 @@ export function AppLayout() {
               <Search size={20} />
               <kbd>Search</kbd>
             </Link>
+            <ThemeToggle />
             {profile && (
               <Link to={ROUTES.TRIPS} className="round-btn" aria-label={`${pending} pending join requests`}>
                 <Bell size={20} />
@@ -161,5 +163,16 @@ export function AppLayout() {
         ))}
       </div>
     </>
+  );
+}
+
+function ThemeToggle() {
+  useTheme((state) => state.theme);
+  const { isDark, toggle } = useTheme.getState();
+  const dark = isDark();
+  return (
+    <button type="button" className="round-btn" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={toggle}>
+      {dark ? <Sun size={20} /> : <Moon size={20} />}
+    </button>
   );
 }

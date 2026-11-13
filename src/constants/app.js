@@ -5,10 +5,11 @@ export const STORAGE_KEYS = {
   GEOCODE: "travel-matcher-geocode",
   DRAFTS: "travel-matcher-drafts",
   SEARCH: "travel-matcher-search",
+  THEME: "travel-matcher-theme",
 };
 
 // Nominatim allows one request per second; stay just under it.
-export const GEOCODE = { SPACING_MS: 1100, VIEWBOX_DEG: 0.2, MIN_WORDS: 2 };
+export const GEOCODE = { SPACING_MS: 1100, VIEWBOX_DEG: 0.2, SHORT_WORDS: 3 };
 
 export const REQUEST_TIMEOUT_MS = 30000;
 export const CHAT_POLL_MS = 4000;

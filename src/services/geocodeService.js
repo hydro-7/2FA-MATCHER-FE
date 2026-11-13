@@ -22,7 +22,7 @@ function remember(key, value) {
 }
 
 // Requests run one at a time, spaced to respect the public geocoder's rate limit.
-function search(query, near) {
+function search(query, near, isActive = () => true) {
   const params = new URLSearchParams({ q: query, format: "jsonv2", limit: "1" });
   if (near) {
     const d = GEOCODE.VIEWBOX_DEG;
@@ -30,27 +30,41 @@ function search(query, near) {
     params.set("bounded", "1");
   }
   const run = queue.then(async () => {
+    // Skip lookups whose screen was left or restarted while they waited in the queue.
+    if (!isActive()) throw new Error("cancelled");
     const response = await fetch(`${MAP_CONFIG.GEOCODER_URL}?${params}`, { headers: { Accept: "application/json" } });
     const [hit] = response.ok ? await response.json() : [];
     return hit ? { lat: Number(hit.lat), lng: Number(hit.lon) } : null;
   });
-  queue = run.catch(() => null).then(() => new Promise((resolve) => setTimeout(resolve, GEOCODE.SPACING_MS)));
+  queue = run.then(
+    () => new Promise((resolve) => setTimeout(resolve, GEOCODE.SPACING_MS)),
+    (error) => (error.message === "cancelled" ? null : new Promise((resolve) => setTimeout(resolve, GEOCODE.SPACING_MS))),
+  );
   return run;
 }
 
 // Free-text activities ("Fushimi Inari Shrine visit") often only match once trailing words are dropped.
 function candidates(text) {
   const words = text.replace(/[&,()]/g, " ").split(/\s+/).filter(Boolean);
-  const lengths = [words.length, 4, 3, GEOCODE.MIN_WORDS].filter((n) => n <= words.length);
+  const lengths = [words.length, GEOCODE.SHORT_WORDS].filter((n) => n <= words.length);
   return [...new Set(lengths.map((n) => words.slice(0, n).join(" ")))].filter(Boolean);
 }
 
-export async function geocodePlace(text, city, near) {
+export function cachedPlace(text, city) {
+  const key = `${city}|${text}`.toLowerCase();
+  return key in cache ? cache[key] : undefined;
+}
+
+export async function geocodePlace(text, city, near, isActive) {
   const key = `${city}|${text}`.toLowerCase();
   if (key in cache) return cache[key];
   let found = null;
   for (const query of candidates(text)) {
-    found = await search(`${query}, ${city}`, near).catch(() => null);
+    try {
+      found = await search(`${query}, ${city}`, near, isActive);
+    } catch (error) {
+      if (error.message === "cancelled") return undefined;
+    }
     if (found) break;
   }
   remember(key, found);

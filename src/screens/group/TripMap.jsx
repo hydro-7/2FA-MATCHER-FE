@@ -9,7 +9,7 @@ import { formatClock } from "../../lib/format";
 import { distanceKm } from "../../lib/geo";
 import { parseItinerary } from "../../lib/itinerary";
 import { useResource } from "../../hooks/useResource";
-import { geocodeCity, geocodePlace } from "../../services/geocodeService";
+import { cachedPlace, geocodeCity, geocodePlace } from "../../services/geocodeService";
 import { planningService } from "../../services/planningService";
 
 const BED_SVG =
@@ -43,40 +43,47 @@ function LocateButton({ points, fallback }) {
   );
 }
 
-function useCoordinates(days, city, near) {
+// Cached places show at once; the rest are looked up one by one once the city is known.
+function useCoordinates(days, city, near, ready) {
+  const texts = useMemo(() => [...new Set(days.flatMap((day) => day.items.map((item) => item.text)))], [days]);
   const [coords, setCoords] = useState({});
-  const [pending, setPending] = useState(0);
+  const textsKey = texts.join("|");
   useEffect(() => {
     let active = true;
-    const texts = [...new Set(days.flatMap((day) => day.items.map((item) => item.text)))];
-    setPending(texts.length);
+    const known = {};
+    for (const text of texts) {
+      const hit = cachedPlace(text, city);
+      if (hit !== undefined) known[text] = hit;
+    }
+    setCoords(known);
+    if (!ready) return;
     (async () => {
-      for (const text of texts) {
-        const found = await geocodePlace(text, city, near);
+      for (const text of texts.filter((item) => !(item in known))) {
+        const found = await geocodePlace(text, city, near, () => active);
         if (!active) return;
-        setCoords((current) => ({ ...current, [text]: found }));
-        setPending((value) => value - 1);
+        if (found !== undefined) setCoords((current) => ({ ...current, [text]: found }));
       }
     })();
     return () => {
       active = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [days.length, city, near?.lat]);
-  return { coords, pending };
+  }, [textsKey, city, ready]);
+  return { coords, pending: texts.filter((text) => !(text in coords)).length };
 }
 
 export function TripMap() {
   const { group } = useOutletContext();
   const plan = useMemo(() => parseItinerary(group.itinerary), [group.itinerary]);
   const saved = useResource(() => planningService.saved(group.id), `saved-${group.id}`);
-  const [cityCenter, setCityCenter] = useState(null);
+  const [city, setCity] = useState({ ready: false, point: null });
   const [dayIndex, setDayIndex] = useState(0);
   const [layers, setLayers] = useState({ hotels: true, places: true, route: true });
 
   useEffect(() => {
     let active = true;
-    geocodeCity(group.city).then((found) => active && setCityCenter(found));
+    setCity({ ready: false, point: null });
+    geocodeCity(group.city).then((point) => active && setCity({ ready: true, point }));
     return () => {
       active = false;
     };
@@ -91,8 +98,8 @@ export function TripMap() {
     return [...unique.values()];
   }, [group.booking, saved.data]);
 
-  const near = cityCenter ?? hotels[0] ?? null;
-  const { coords, pending } = useCoordinates(plan.days, group.city, near);
+  const near = city.point ?? hotels[0] ?? null;
+  const { coords, pending } = useCoordinates(plan.days, group.city, city.point, city.ready);
   const day = plan.days[dayIndex];
   const base = hotels[0];
 
@@ -154,6 +161,9 @@ export function TripMap() {
 
       <section className="ws-card map-main">
         <div className="map-frame">
+          {!near && !city.ready ? (
+            <div className="map-canvas map-loading">Locating {group.city}…</div>
+          ) : (
           <MapContainer center={near ? [near.lat, near.lng] : [0, 0]} zoom={near ? 12 : 2} scrollWheelZoom className="map-canvas">
             <TileLayer url={MAP_CONFIG.TILE_URL} attribution={MAP_CONFIG.TILE_ATTRIBUTION} />
             <FitBounds points={visible} fallback={near} />
@@ -179,6 +189,7 @@ export function TripMap() {
             )}
             <LocateButton points={visible} fallback={near} />
           </MapContainer>
+          )}
         </div>
 
         {day ? (

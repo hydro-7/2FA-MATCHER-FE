@@ -11,7 +11,7 @@ main:has(> .wizard) {
   min-height: calc(100vh - 76px);
   padding: 32px var(--gutter) 64px 0;
   background:
-    radial-gradient(1000px 300px at 70% 105%, #e7eefb 0%, transparent 70%),
+    radial-gradient(1000px 300px at 70% 105%, var(--glow) 0%, transparent 70%),
     var(--page);
 }
 
@@ -106,7 +106,7 @@ main:has(> .wizard) {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: #eef1f7;
+  background: var(--subtle);
   font-size: 19px;
 }
 
@@ -163,9 +163,9 @@ main:has(> .wizard) {
   flex: 1 1 260px;
   gap: 12px;
   padding: 20px 20px 18px;
-  border: 1px solid #edf1f7;
+  border: 1px solid var(--ring);
   border-radius: 20px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 6px 22px rgb(11 19 37 / 6%);
 }
 
@@ -185,7 +185,7 @@ main:has(> .wizard) {
 }
 
 .field-label i {
-  color: #ef4444;
+  color: var(--red-ink);
   font-style: normal;
 }
 
@@ -209,7 +209,7 @@ main:has(> .wizard) {
   padding: 0 18px;
   border: 1px solid var(--ring);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
   font-size: 18px;
@@ -260,7 +260,7 @@ main:has(> .wizard) {
   padding: 0 18px;
   border: 1px solid var(--ring);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
   font-size: 18px;
@@ -293,9 +293,9 @@ main:has(> .wizard) {
   gap: 10px;
   min-height: 92px;
   padding: 14px 10px;
-  border: 1px solid #edf1f7;
+  border: 1px solid var(--ring);
   border-radius: 16px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
   font-size: 17px;
@@ -341,9 +341,9 @@ main:has(> .wizard) {
   justify-items: start;
   gap: 8px;
   padding: 24px;
-  border: 1px solid #edf1f7;
+  border: 1px solid var(--ring);
   border-radius: 20px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   box-shadow: 0 6px 22px rgb(11 19 37 / 6%);
   cursor: pointer;
@@ -432,7 +432,7 @@ main:has(> .wizard) {
   min-width: 160px;
   padding: 0 24px;
   border: 1px solid var(--ring);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
 }
 
@@ -554,9 +554,9 @@ main:has(> .wizard) {
   display: grid;
   gap: 22px;
   padding: 26px;
-  border: 1px solid #edf1f7;
+  border: 1px solid var(--ring);
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 6px 22px rgb(11 19 37 / 6%);
 }
 
@@ -583,7 +583,7 @@ main:has(> .wizard) {
   min-height: 52px;
   border: 1px solid var(--ring);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-family: inherit;
   font-size: 17px;
@@ -615,7 +615,7 @@ main:has(> .wizard) {
 
 .input-with-icon.readonly {
   min-height: 52px;
-  background: #f7f9fd;
+  background: var(--subtle);
   color: var(--ink);
   font-size: 17px;
   font-weight: 600;
@@ -675,7 +675,7 @@ main:has(> .wizard) {
 }
 
 .day-list button:hover {
-  background: #f3f6fb;
+  background: var(--subtle);
   filter: none;
 }
 
@@ -754,7 +754,7 @@ main:has(> .wizard) {
   height: 12px;
   border: 2.5px solid var(--brand);
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
 }
 
 .timeline input {
@@ -779,7 +779,7 @@ main:has(> .wizard) {
 }
 
 .timeline button:hover {
-  color: #dc2626;
+  color: var(--red-ink);
   filter: none;
 }
 
@@ -791,7 +791,7 @@ main:has(> .wizard) {
   min-height: 52px;
   border: 1px solid var(--ring);
   border-radius: 14px;
-  background: #f7f9fd;
+  background: var(--subtle);
   color: var(--ink);
   font-size: 17px;
   font-weight: 600;
@@ -829,7 +829,7 @@ main:has(> .wizard) {
   padding: 18px;
   overflow: auto;
   border-radius: 14px;
-  background: #f7f9fd;
+  background: var(--subtle);
   color: var(--ink);
   font-family: inherit;
   font-size: 15px;
@@ -917,7 +917,7 @@ main:has(> .wizard) {
   gap: 6px;
   padding: 7px 8px 7px 14px;
   border-radius: 999px;
-  background: #eef1f7;
+  background: var(--subtle);
   color: var(--ink);
   font-size: 15px;
   font-weight: 600;
@@ -952,7 +952,7 @@ main:has(> .wizard) {
   margin-top: 22px;
   padding: 22px 26px;
   border-radius: 20px;
-  background: #eef3fc;
+  background: var(--brand-soft);
   color: var(--brand);
 }
 
@@ -966,7 +966,7 @@ main:has(> .wizard) {
 
 .summary-price {
   padding-left: 24px;
-  border-left: 1px solid #d6dff0;
+  border-left: 1px solid var(--ring);
   text-align: right;
 }
 
@@ -1123,9 +1123,9 @@ main:has(> .wizard) {
   z-index: 50;
   width: 280px;
   padding: 18px;
-  border: 1px solid #edf1f7;
+  border: 1px solid var(--ring);
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 22px 50px rgb(11 19 37 / 18%);
   animation: dropdown-in 0.14s ease-out;
 }
@@ -1145,7 +1145,7 @@ main:has(> .wizard) {
   padding: 2px 10px;
   border: 0;
   border-radius: 12px;
-  background: #f3f6fb;
+  background: var(--subtle);
   color: var(--ink);
   font-size: 34px;
   font-weight: 800;
@@ -1167,7 +1167,7 @@ main:has(> .wizard) {
   padding: 4px 10px;
   border: 1px solid var(--ring);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink-soft);
   font-size: 13px;
   font-weight: 700;
@@ -1184,7 +1184,7 @@ main:has(> .wizard) {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: #f3f6fb;
+  background: var(--subtle);
 }
 
 .clock-center {
@@ -1227,7 +1227,7 @@ main:has(> .wizard) {
 
 .clock-num:hover {
   filter: none;
-  background: #e2e9f6;
+  background: var(--subtle);
 }
 
 .clock-num.on {

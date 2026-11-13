@@ -12,19 +12,96 @@
   --surface: #ffffff;
   --page: #f7f9fd;
   --ring: #e6ebf4;
+  --subtle: #f1f4fa;
+  --glow: #e7eefb;
+  --green-soft: #dcfce7;
+  --green-ink: #15803d;
+  --amber-soft: #fff4e0;
+  --amber-ink: #b45309;
+  --amber-line: #fde68a;
+  --red-soft: #fee2e2;
+  --red-ink: #b91c1c;
+  --shadow: rgb(11 19 37 / 6%);
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--page);
 }
 
 body {
   background: var(--page);
+  color: var(--ink);
+}
+
+/* Dark theme: an explicit choice, or the system setting when none is saved. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --brand: #4d8dff;
+  --brand-dark: #2f74f5;
+  --brand-soft: #111a2e;
+  --ink: #e7ecf6;
+  --ink-soft: #a3a3a3;
+  --surface: #0d0d0d;
+  --page: #000000;
+  --ring: #262626;
+  --subtle: #171717;
+  --glow: #000000;
+  --green-soft: #0e2d1e;
+  --green-ink: #4ade80;
+  --amber-soft: #2d220f;
+  --amber-ink: #fbbf24;
+  --amber-line: #5a4414;
+  --red-soft: #3a1717;
+  --red-ink: #f87171;
+  --shadow: rgb(0 0 0 / 35%);
+  --navy: #e7ecf6;
+  --blue: #4d8dff;
+  --line: #262626;
+  --muted: #a3a3a3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --brand: #4d8dff;
+    --brand-dark: #2f74f5;
+    --brand-soft: #111a2e;
+    --ink: #e7ecf6;
+    --ink-soft: #a3a3a3;
+    --surface: #0d0d0d;
+    --page: #000000;
+    --ring: #262626;
+    --subtle: #171717;
+    --glow: #000000;
+    --green-soft: #0e2d1e;
+    --green-ink: #4ade80;
+    --amber-soft: #2d220f;
+    --amber-ink: #fbbf24;
+    --amber-line: #5a4414;
+    --red-soft: #3a1717;
+    --red-ink: #f87171;
+    --shadow: rgb(0 0 0 / 35%);
+    --navy: #e7ecf6;
+    --blue: #4d8dff;
+    --line: #262626;
+    --muted: #a3a3a3;
+  }
+}
+
+/* OSM tiles are light-only; invert them so the map matches the dark theme. */
+:root[data-theme="dark"] .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+  }
 }
 
 .topbar {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgb(255 255 255 / 92%);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
   backdrop-filter: blur(12px);
 }
 
@@ -75,7 +152,7 @@ body {
 }
 
 .topnav a:hover {
-  background: #f1f4fa;
+  background: var(--subtle);
 }
 
 .topnav a.active {
@@ -97,7 +174,7 @@ body {
   padding: 0 18px;
   border: 0;
   border-radius: 999px;
-  background: #f1f4fa;
+  background: var(--subtle);
   color: var(--ink);
   font-family: inherit;
   font-weight: 600;
@@ -123,7 +200,7 @@ body {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: #f1f4fa;
+  background: var(--subtle);
   color: var(--ink);
   cursor: pointer;
 }
@@ -134,7 +211,7 @@ body {
   right: 10px;
   width: 9px;
   height: 9px;
-  border: 2px solid #f1f4fa;
+  border: 2px solid var(--ring);
   border-radius: 50%;
   background: #ef4444;
 }
@@ -150,7 +227,7 @@ body {
   height: 48px;
   min-height: 0;
   padding: 0;
-  border: 2px solid #fff;
+  border: 2px solid var(--surface);
   border-radius: 50%;
   background: linear-gradient(135deg, #0057ff, #7c3aed);
   color: #fff;
@@ -170,7 +247,7 @@ body {
   padding: 8px;
   border: 1px solid var(--ring);
   border-radius: 16px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 20px 40px rgb(11 19 37 / 14%);
 }
 
@@ -206,7 +283,7 @@ body {
 
 .me-menu a:hover,
 .me-menu button:hover {
-  background: #f1f4fa;
+  background: var(--subtle);
 }
 
 .signup-btn {

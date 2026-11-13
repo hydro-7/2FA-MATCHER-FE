@@ -13,7 +13,7 @@
   padding: 0 40px 0 14px;
   border: 1px solid var(--ring);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-weight: 600;
   text-align: left;
@@ -77,9 +77,9 @@
   margin: 0;
   padding: 6px;
   overflow-y: auto;
-  border: 1px solid #edf1f7;
+  border: 1px solid var(--ring);
   border-radius: 16px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 18px 44px rgb(11 19 37 / 14%);
   list-style: none;
   animation: dropdown-in 0.12s ease-out;
@@ -99,7 +99,7 @@
 }
 
 .dropdown-menu li.active {
-  background: #f3f6fb;
+  background: var(--subtle);
 }
 
 .dropdown-menu li.selected {

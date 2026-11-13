@@ -1,7 +1,7 @@
 :root {
   font-family: Arial, Helvetica, sans-serif;
-  color: #1a1a1a;
-  background: #f6f8fb;
+  color: var(--ink);
+  background: var(--page);
   font-synthesis: none;
   font-weight: 400;
   line-height: 1.5;
@@ -50,9 +50,9 @@ summary:focus-visible {
   outline-offset: 3px;
 }
 button.secondary {
-  background: white;
+  background: var(--surface);
   color: var(--navy);
-  border-color: #bccbdd;
+  border-color: var(--ring);
 }
 button.text-button {
   background: transparent;
@@ -62,7 +62,7 @@ button.text-button {
   min-height: 36px;
 }
 button.icon-button {
-  background: #eef3fb;
+  background: var(--subtle);
   color: var(--navy);
   font-size: 24px;
   padding: 0 12px;
@@ -81,7 +81,7 @@ h1 {
   line-height: 1.12;
   letter-spacing: -1.8px;
   margin-bottom: 20px;
-  color: #082752;
+  color: var(--ink);
 }
 h2 {
   font-size: 25px;
@@ -161,7 +161,7 @@ footer {
 }
 .panel {
   padding: 28px;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 14px;
 }
@@ -178,7 +178,7 @@ footer {
 .aside-note {
   border-left: 3px solid #ffb700;
   padding: 12px 18px;
-  background: #fff6dc;
+  background: var(--amber-soft);
   font-size: 14px;
   max-width: 340px;
   margin-top: 40px;
@@ -205,12 +205,12 @@ footer {
 .field select,
 .field textarea {
   width: 100%;
-  border: 1px solid #b9c5d4;
+  border: 1px solid var(--ring);
   border-radius: 7px;
   padding: 11px 12px;
   min-height: 45px;
-  color: #1a1a1a;
-  background: white;
+  color: var(--ink);
+  background: var(--surface);
   min-width: 0;
 }
 .field textarea {
@@ -228,9 +228,9 @@ footer {
   display: inline-flex;
   align-items: center;
   padding: 7px 11px;
-  background: #f7f9fc;
+  background: var(--subtle);
   border: 1px solid var(--line);
-  color: #46546a;
+  color: var(--ink-soft);
   border-radius: 30px;
   font-size: 12px;
   font-weight: 400;
@@ -238,9 +238,9 @@ footer {
   line-height: 1.3;
 }
 .chip.selected {
-  background: #fff0bf;
-  border-color: #ffcf66;
-  color: #503800;
+  background: var(--amber-soft);
+  border-color: var(--amber-line);
+  color: var(--amber-ink);
 }
 .chip:hover {
   filter: none;
@@ -261,28 +261,28 @@ fieldset p {
 .notice {
   padding: 13px 16px;
   border-radius: 8px;
-  background: #ebf4ff;
-  color: #174776;
+  background: var(--brand-soft);
+  color: var(--ink);
   font-size: 14px;
   margin: 16px 0;
   overflow-wrap: anywhere;
 }
 .notice.error {
-  background: #fff0ee;
-  color: #a12622;
-  border: 1px solid #f1c4c0;
+  background: var(--red-soft);
+  color: var(--red-ink);
+  border: 1px solid var(--ring);
 }
 .empty {
   padding: 38px 20px;
   text-align: center;
-  border: 1px dashed #cad6e5;
-  background: #ffffffa0;
+  border: 1px dashed var(--ring);
+  background: color-mix(in srgb, var(--surface) 63%, transparent);
   border-radius: 14px;
   margin: 15px 0;
   color: var(--muted);
 }
 .empty h3 {
-  color: #253c58;
+  color: var(--ink);
 }
 .empty p {
   max-width: 420px;
@@ -309,15 +309,15 @@ fieldset p {
 }
 .choice {
   text-align: left;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   padding: 30px;
-  color: #1a1a1a;
+  color: var(--ink);
 }
 .choice > span {
   display: grid;
   place-items: center;
-  background: #edf5ff;
+  background: var(--brand-soft);
   color: var(--blue);
   border-radius: 12px;
   width: 50px;
@@ -358,7 +358,7 @@ fieldset p {
   min-height: 590px;
   border-radius: 16px;
   padding: 70px 45px;
-  background: linear-gradient(150deg, #e4f1ff, #fff7e6);
+  background: linear-gradient(150deg, var(--brand-soft), var(--amber-soft));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -366,7 +366,7 @@ fieldset p {
 .discovery-intro h2 {
   font-size: 40px;
   letter-spacing: -1.4px;
-  color: #082752;
+  color: var(--ink);
 }
 .discovery-intro p {
   max-width: 380px;
@@ -395,7 +395,7 @@ fieldset p {
 .badge {
   display: inline-block;
   white-space: normal;
-  background: #edf4fe;
+  background: var(--brand-soft);
   color: var(--navy);
   padding: 6px 10px;
   font-size: 12px;
@@ -406,7 +406,7 @@ fieldset p {
   border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
-  background: white;
+  background: var(--surface);
 }
 .group-cover {
   overflow: hidden;
@@ -446,9 +446,9 @@ fieldset p {
   flex-shrink: 0;
   display: inline-grid;
   place-items: center;
-  background: #e3edff;
+  background: var(--brand-soft);
   color: var(--navy);
-  border: 2px solid white;
+  border: 2px solid var(--surface);
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -519,7 +519,7 @@ fieldset p {
   margin: 25px 0;
   padding: 22px 25px;
   border-radius: 12px;
-  background: #eaf2fe;
+  background: var(--brand-soft);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -570,7 +570,7 @@ fieldset p {
   color: #dceaff;
 }
 .detail-cover .badge {
-  background: #ffffffeb;
+  background: var(--surface);
 }
 .tabs {
   display: flex;
@@ -600,7 +600,7 @@ fieldset p {
 }
 .itinerary {
   white-space: pre-wrap;
-  color: #46546a;
+  color: var(--ink-soft);
   line-height: 1.9;
 }
 .detail-grid h3 {
@@ -612,7 +612,7 @@ fieldset p {
 .person-button {
   padding: 5px 0;
   background: none;
-  color: #1a1a1a;
+  color: var(--ink);
   font-weight: 400;
 }
 .member-grid {
@@ -625,8 +625,8 @@ fieldset p {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  background: #f7faff;
-  color: #1a1a1a;
+  background: var(--subtle);
+  color: var(--ink);
   border: 1px solid var(--line);
   padding: 25px 15px;
 }
@@ -672,17 +672,17 @@ fieldset p {
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
-  background: white;
+  background: var(--surface);
 }
 .hotel-image {
-  background: #dce9ed;
+  background: var(--subtle);
   background-size: cover;
   background-position: center;
   min-height: 260px;
   display: grid;
   place-items: center;
   font-size: 65px;
-  color: #7b9ca7;
+  color: var(--ink-soft);
 }
 .hotel-content {
   padding: 24px;
@@ -701,7 +701,7 @@ fieldset p {
   margin: 18px 0;
 }
 .price-row.highlight {
-  background: #edf5ff;
+  background: var(--brand-soft);
   border-radius: 7px;
   padding: 13px;
   color: var(--navy);
@@ -739,14 +739,14 @@ fieldset p {
   padding: 20px;
 }
 .booking-success {
-  background: #edf8f1;
-  border: 1px solid #b4dac3;
+  background: var(--green-soft);
+  border: 1px solid var(--ring);
   border-radius: 14px;
   padding: 30px;
   margin: 20px 0;
 }
 .booking-success .eyebrow {
-  color: #267242;
+  color: var(--green-ink);
 }
 dialog {
   border: 1px solid var(--line);
@@ -755,7 +755,7 @@ dialog {
   width: min(560px, calc(100% - 30px));
   max-height: 90vh;
   overflow: auto;
-  color: #1a1a1a;
+  color: var(--ink);
 }
 dialog::backdrop {
   background: #001b46a8;
@@ -942,7 +942,7 @@ h3 {
   padding: 16px 20px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: white;
+  background: var(--surface);
   margin: 15px 0 22px;
 }
 .hotel-filters .field {
@@ -972,8 +972,8 @@ h3 {
 }
 .profile-fields:disabled input,
 .profile-fields:disabled select {
-  color: #344b65;
-  background: #f6f8fb;
+  color: var(--ink-soft);
+  background: var(--subtle);
 }
 .pagination {
   justify-content: center;
@@ -993,16 +993,16 @@ h3 {
   margin-bottom: 0;
 }
 :root {
-  background: #f7f8fa;
+  background: var(--page);
   --navy: #003b95;
   --line: #e1e7ef;
 }
 .panel {
-  border-color: #e2e7ef;
+  border-color: var(--ring);
   box-shadow: 0 5px 22px #0b315205;
 }
 .eyebrow {
-  color: #56718f;
+  color: var(--ink-soft);
   letter-spacing: 2px;
 }
 .page-heading {
@@ -1028,13 +1028,13 @@ h3 {
 }
 .field > span {
   font-size: 12px;
-  color: #344b65;
+  color: var(--ink-soft);
 }
 .field input,
 .field select,
 .field textarea {
-  border-color: #c9d4e1;
-  background: #fff;
+  border-color: var(--ring);
+  background: var(--surface);
   border-radius: 9px;
 }
 .field input:focus,
@@ -1049,12 +1049,12 @@ h3 {
   font-size: 12px;
   padding: 8px 12px;
   min-height: 36px;
-  background: white;
+  background: var(--surface);
 }
 .chip.selected {
-  background: #fff3ca;
-  border-color: #efcd6d;
-  color: #654f12;
+  background: var(--amber-soft);
+  border-color: var(--amber-line);
+  color: var(--amber-ink);
 }
 .interest-picker {
   margin: 3px 0 23px;
@@ -1066,11 +1066,11 @@ h3 {
   cursor: pointer;
   font-size: 13px;
   font-weight: 700;
-  color: #344b65;
+  color: var(--ink-soft);
 }
 .interest-picker summary span {
   float: right;
-  background: #edf4ff;
+  background: var(--brand-soft);
   color: var(--navy);
   padding: 2px 8px;
   border-radius: 5px;
@@ -1134,7 +1134,7 @@ h3 {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background: #ffd28d;
+  background: var(--amber-soft);
   opacity: 0.6;
   right: -20px;
   top: -70px;
@@ -1174,7 +1174,7 @@ h3 {
   font-size: 12px;
 }
 .card-footer strong {
-  color: #153d68;
+  color: var(--ink);
 }
 .notice {
   line-height: 1.6;
@@ -1182,7 +1182,7 @@ h3 {
 }
 .empty {
   padding: 35px 24px;
-  background: #fff;
+  background: var(--surface);
   border-style: solid;
 }
 .empty .notice {
@@ -1197,12 +1197,12 @@ h3 {
   height: 56px;
   width: 56px;
   border-radius: 50%;
-  background: #edf4ff;
+  background: var(--brand-soft);
   font-size: 28px;
 }
 .bottom-callout {
-  background: #edf4fd;
-  border: 1px solid #dae7f8;
+  background: var(--brand-soft);
+  border: 1px solid var(--ring);
   padding: 25px;
 }
 .detail-cover {
@@ -1233,11 +1233,11 @@ h3 {
   border-radius: 8px 8px 8px 0;
 }
 .price-row.highlight {
-  color: #16477a;
-  background: #edf4fd;
+  color: var(--ink);
+  background: var(--brand-soft);
 }
 .member-card {
-  background: white;
+  background: var(--surface);
   padding: 28px 18px;
   border-radius: 14px;
 }
@@ -1252,10 +1252,10 @@ h3 {
 .choice:hover {
   border-color: #80ace3;
   filter: none;
-  background: #fbfdff;
+  background: var(--surface);
 }
 footer a {
-  color: #596579;
+  color: var(--ink-soft);
   margin-left: 9px;
 }
 @media (max-width: 1000px) {
@@ -1294,7 +1294,7 @@ footer a {
     order: 1;
   }
   .discovery-layout.has-results > aside .panel {
-    background: #fdfefe;
+    background: var(--surface);
   }
   .card-body .chip {
     font-size: 10px;
@@ -1370,9 +1370,9 @@ footer a {
 }
 
 .chip.failed {
-  border-color: #f2c4c4;
-  background: #fff4f4;
-  color: #a12020;
+  border-color: var(--ring);
+  background: var(--red-soft);
+  color: var(--red-ink);
 }
 
 .count-badge {
@@ -1438,7 +1438,7 @@ footer a {
   gap: 14px;
   height: clamp(280px, 42vh, 440px);
   padding: 24px;
-  background: #f6f8fc;
+  background: var(--page);
   overflow-y: auto;
   align-content: start;
   overscroll-behavior: contain;
@@ -1451,8 +1451,8 @@ footer a {
   padding: 12px 16px;
   border: 1px solid var(--line);
   border-radius: 16px 16px 16px 4px;
-  background: #fff;
-  box-shadow: 0 2px 4px rgb(11 19 37 / 3%);
+  background: var(--surface);
+  box-shadow: 0 2px 4px var(--shadow);
 }
 
 .chat-message.mine {
@@ -1533,18 +1533,18 @@ footer a {
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  background: white;
+  background: var(--surface);
 }
 .segmented button {
-  background: white;
-  color: #596579;
+  background: var(--surface);
+  color: var(--ink-soft);
   min-height: 36px;
   font-size: 13px;
   padding: 7px 12px;
 }
 .segmented button.chosen {
-  background: #eaf3ff;
-  color: #003b95;
+  background: var(--brand-soft);
+  color: var(--ink);
 }
 .swipe-area {
   max-width: 680px;
@@ -1580,17 +1580,17 @@ footer a {
   left: 25px;
   z-index: 3;
   border: 3px solid currentColor;
-  background: #fffffff5;
+  background: var(--surface);
   padding: 8px 14px;
   border-radius: 8px;
-  color: #167448;
+  color: var(--green-ink);
   transform: rotate(-10deg);
   font-size: 20px;
   font-weight: 800;
   pointer-events: none;
 }
 .swipe-stamp.no {
-  color: #a34a37;
+  color: var(--red-ink);
 }
 .swipe-area > .caption {
   text-align: center;
