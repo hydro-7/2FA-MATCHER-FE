@@ -350,3 +350,205 @@
   margin: 0;
   font-size: 14px;
 }
+
+/* Traveller profile: who they are on the left, their groups on the right. */
+.mp {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.mp-layout {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.mp-card {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.mp-card h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.mp-facts {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--ring);
+  border-bottom: 1px solid var(--ring);
+  list-style: none;
+  text-align: left;
+}
+
+.mp-facts li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.mp-facts svg {
+  flex: none;
+  color: var(--brand);
+}
+
+.mp-label {
+  justify-self: start;
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mp-interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+.mp-interests .tile-chip {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.mp-card .profile-friend-actions {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.mp-groups h2 {
+  margin: 0 0 14px;
+  font-size: 22px;
+}
+
+.mp-group-list {
+  display: grid;
+  gap: 12px;
+}
+
+.mp-group {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 18px 10px 10px;
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.mp-group:hover {
+  border-color: var(--brand);
+}
+
+.mp-group-photo {
+  height: 84px;
+  border-radius: 12px;
+  background-position: center;
+  background-size: cover;
+}
+
+.mp-group-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mp-group-body strong {
+  overflow: hidden;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mp-group-body small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.mp-group-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.mp-group-tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--subtle);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mp-group-tags .booked {
+  background: var(--green-soft);
+  color: var(--green-ink);
+}
+
+.mp-group-go {
+  color: var(--ink-soft);
+}
+
+.mp-private {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px 24px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.mp-private svg {
+  color: var(--brand);
+}
+
+.mp-private h3 {
+  margin: 4px 0 0;
+  color: var(--ink);
+}
+
+.mp-private p {
+  max-width: 360px;
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .mp-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mp-group {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .mp-group-photo {
+    height: 70px;
+  }
+
+  .mp-group-go {
+    display: none;
+  }
+}

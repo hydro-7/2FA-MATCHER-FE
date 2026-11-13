@@ -1381,3 +1381,273 @@
     opacity: 0.6;
   }
 }
+
+/* Itinerary tab: day list on the left, that day's timeline on the right. */
+.itin {
+  display: grid;
+  gap: 20px;
+}
+
+.itin-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.itin-head h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.itin-head p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--ink-soft);
+  white-space: pre-line;
+}
+
+.itin-map-link,
+.itin-stop a,
+.itin-places a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.itin-map-link {
+  padding: 10px 14px;
+  border: 1px solid var(--ring);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.itin-notes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.itin-style {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.itin-body {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.itin-days {
+  display: grid;
+  gap: 8px;
+}
+
+.itin-days button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--ring);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+}
+
+.itin-days button:hover {
+  filter: none;
+  border-color: var(--brand);
+}
+
+.itin-days button.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.itin-days strong {
+  display: block;
+  font-size: 15px;
+}
+
+.itin-days small {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.itin-day-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--subtle);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.itin-days button.active .itin-day-num {
+  background: var(--brand);
+  color: #fff;
+}
+
+.itin-day,
+.itin-places {
+  padding: 22px 24px;
+  border: 1px solid var(--ring);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.itin-day h3,
+.itin-places h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 19px;
+}
+
+.itin-day h3 small {
+  margin-left: 4px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.itin-day-title {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+}
+
+.itin-timeline {
+  display: grid;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itin-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px 18px minmax(0, 1fr);
+  gap: 12px;
+  padding-bottom: 20px;
+}
+
+.itin-timeline li:last-child {
+  padding-bottom: 0;
+}
+
+/* The line joining each stop to the next. */
+.itin-timeline li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  left: calc(76px + 12px + 8px);
+  width: 2px;
+  background: var(--ring);
+}
+
+.itin-time {
+  padding-top: 1px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.itin-dot {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border: 4px solid var(--brand-soft);
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.itin-stop {
+  display: grid;
+  gap: 4px;
+}
+
+.itin-stop strong {
+  font-size: 15px;
+}
+
+.itin-stop a {
+  font-size: 13px;
+}
+
+.itin-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 0;
+  color: var(--ink-soft);
+}
+
+.itin-places ul {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itin-places li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ring);
+  border-radius: 12px;
+}
+
+.itin-places li strong {
+  flex: 1;
+}
+
+@media (max-width: 800px) {
+  .itin-body {
+    grid-template-columns: 1fr;
+  }
+
+  .itin-days {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .itin-days button {
+    flex: none;
+  }
+
+  .itin-timeline li {
+    grid-template-columns: 60px 18px minmax(0, 1fr);
+  }
+
+  .itin-timeline li:not(:last-child)::after {
+    left: calc(60px + 12px + 8px);
+  }
+}
