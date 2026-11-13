@@ -56,13 +56,13 @@
 .friends-tabs button.active {
   color: var(--brand);
   border-bottom-color: var(--brand);
-  background: #eaf1ff;
+  background: var(--brand-soft);
 }
 .friends-tabs button span {
   font-size: 11px;
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
-  border: 1px solid #d8e5ff;
+  border: 1px solid var(--ring);
   padding: 2px 6px;
   border-radius: 20px;
 }
@@ -74,7 +74,7 @@
   padding: 0 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   color: var(--muted);
   margin-bottom: 24px;
 }
@@ -106,7 +106,7 @@
   align-items: stretch;
   gap: 18px;
   padding: 24px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 20px;
   box-shadow: 0 4px 18px rgb(11 19 37 / 3%);
@@ -127,7 +127,7 @@
   width: 54px;
   height: 54px;
   font-size: 22px;
-  background: #eaf1ff;
+  background: var(--brand-soft);
   color: var(--brand);
 }
 .friend-person h3 {
@@ -169,7 +169,7 @@
   padding: 9px 13px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   text-decoration: none;
   font: inherit;
@@ -178,8 +178,8 @@
   white-space: normal;
 }
 .friend-button:hover {
-  background: #f3f6fc;
-  border-color: #c4d7f8;
+  background: var(--subtle);
+  border-color: var(--brand);
 }
 .friend-button.primary {
   background: var(--brand);
@@ -202,8 +202,8 @@
   font-weight: 600;
 }
 .friend-status.confirmed {
-  background: #eaf7ee;
-  color: #227445;
+  background: var(--green-soft);
+  color: var(--green-ink);
   border-radius: 20px;
   padding: 7px 10px;
 }
@@ -234,7 +234,7 @@
   padding: 56px 24px;
   border: 1px solid var(--line);
   border-radius: 20px;
-  background: #fff;
+  background: var(--surface);
   text-align: center;
 }
 .friends-empty > svg {
@@ -268,7 +268,7 @@
   min-width: 24px;
   height: 24px;
   border-radius: 20px;
-  background: #eaf1ff;
+  background: var(--brand-soft);
   color: var(--brand);
   font-size: 12px;
 }
