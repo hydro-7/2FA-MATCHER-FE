@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { api } from "./api";
+import { useEffect, useRef, useState } from "react";
+import { api, isPreview } from "./api";
 import {
   Avatar,
   Chips,
@@ -210,7 +210,11 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
           <span className="eyebrow">
             {create ? "MAKE ROOM FOR COMPANY" : "YOUR NEXT CHAPTER"}
           </span>
-          <h2>{create ? "Create your group trip" : "Where are you headed?"}</h2>
+          {create ? (
+            <h1 className="form-title">Create your group trip</h1>
+          ) : (
+            <h2>Where are you headed?</h2>
+          )}
         </div>
         <span className="badge">
           {create ? "You lead the way" : "Find your fit"}
@@ -230,15 +234,6 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
           </Field>
         )}
         <div className="form-grid">
-          {!create && (
-            <Field label="Home city">
-              <input
-                required
-                value={form.homeCity}
-                onChange={(e) => change("homeCity", e.target.value)}
-              />
-            </Field>
-          )}
           <Field label="Destination">
             <CatalogSelect
               required
@@ -315,14 +310,19 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
             />
           </Field>
         ) : (
-          <fieldset>
-            <legend>Trip interests</legend>
+          <details className="interest-picker">
+            <summary>
+              Trip interests <span>{form.interests.length} selected</span>
+            </summary>
+            <p className="caption">
+              Choose what you’d like to share on this trip.
+            </p>
             <Chips
               options={catalog.data?.interests}
               selected={form.interests}
               onChange={(values) => change("interests", values)}
             />
-          </fieldset>
+          </details>
         )}
         <Notice error>{error}</Notice>
         <button disabled={busy || !catalog.data}>
@@ -332,7 +332,9 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
               : "Finding groups…"
             : create
               ? "Publish group →"
-              : "Find compatible groups →"}
+              : isPreview
+                ? "Preview discovery cards →"
+                : "Find compatible groups →"}
         </button>
       </form>
     </div>
@@ -348,7 +350,16 @@ export function Discover({ catalog, profile, onOpen }) {
   const [interests, setInterests] = useState([]);
   const [composition, setComposition] = useState("");
   const [criteria, setCriteria] = useState(null);
-  const [pointerStart, setPointerStart] = useState(null);
+  const pointerStart = useRef(null);
+  const [dragX, setDragX] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  useEffect(() => {
+    if (isPreview)
+      api
+        .searchGroups({})
+        .then((response) => setResults(response.groups))
+        .catch((failure) => setError(failure.message));
+  }, []);
   async function search(values) {
     const response = await api.searchGroups({
       ...values,
@@ -372,7 +383,10 @@ export function Discover({ catalog, profile, onOpen }) {
     }
   }
   function skip() {
-    if (!sending) setIndex((value) => value + 1);
+    if (!sending) {
+      setIndex((value) => value + 1);
+      setFeedback("Skipped. On to the next adventure.");
+    }
   }
   async function join(group) {
     if (sending || !group?.canRequest) return;
@@ -380,6 +394,11 @@ export function Discover({ catalog, profile, onOpen }) {
     setError("");
     try {
       await api.join(group.id);
+      setFeedback(
+        isPreview
+          ? "Preview request sent. Try the creator view to explore approvals."
+          : "Request sent. You’ll join once the creator approves.",
+      );
       setResults((current) =>
         current.map((item) =>
           item.id === group.id
@@ -403,9 +422,10 @@ export function Discover({ catalog, profile, onOpen }) {
           Discover groups that match the way you want to travel.
         </p>
       </div>
-      <div className="discovery-layout">
+      <div className={`discovery-layout ${results ? "has-results" : ""}`}>
         <aside>
           <TripForm
+            key={profile?.id || "search-profile"}
             catalog={catalog}
             mode="search"
             profile={profile}
@@ -437,7 +457,7 @@ export function Discover({ catalog, profile, onOpen }) {
             <>
               <div className="section-heading">
                 <h2>
-                  {results.length} compatible{" "}
+                  {results.length} {isPreview ? "example" : "compatible"}{" "}
                   {results.length === 1 ? "group" : "groups"}
                 </h2>
                 <div className="segmented">
@@ -497,6 +517,7 @@ export function Discover({ catalog, profile, onOpen }) {
                 </div>
               </details>
               <Notice error>{error}</Notice>
+              <Notice>{feedback}</Notice>
               {!results.length ? (
                 <Empty title="No compatible groups yet">
                   Try different dates, a wider budget or additional interests.
@@ -511,23 +532,71 @@ export function Discover({ catalog, profile, onOpen }) {
                 <div
                   className="swipe-area"
                   onPointerDown={(event) => {
-                    if (!event.target.closest("button"))
-                      setPointerStart(event.clientX);
+                    if (
+                      sending ||
+                      event.target.closest("button, a, input") ||
+                      (event.pointerType === "mouse" && event.button !== 0)
+                    )
+                      return;
+                    pointerStart.current = {
+                      x: event.clientX,
+                      y: event.clientY,
+                    };
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                  }}
+                  onPointerMove={(event) => {
+                    if (pointerStart.current) {
+                      const x = event.clientX - pointerStart.current.x;
+                      const y = event.clientY - pointerStart.current.y;
+                      if (Math.abs(x) > Math.abs(y))
+                        setDragX(Math.max(-160, Math.min(160, x)));
+                    }
                   }}
                   onPointerUp={(event) => {
-                    if (
-                      pointerStart !== null &&
-                      !event.target.closest("button")
-                    ) {
-                      const distance = event.clientX - pointerStart;
-                      if (distance < -90) skip();
-                      if (distance > 90) join(current);
+                    if (pointerStart.current) {
+                      const distance = event.clientX - pointerStart.current.x;
+                      const vertical = Math.abs(
+                        event.clientY - pointerStart.current.y,
+                      );
+                      if (
+                        Math.abs(distance) > vertical &&
+                        Math.abs(distance) > 90
+                      ) {
+                        if (distance < 0) skip();
+                        else if (current.canRequest) join(current);
+                        else
+                          setFeedback(
+                            "This group is already joined or has a pending request. You can still view its details.",
+                          );
+                      }
                     }
-                    setPointerStart(null);
+                    pointerStart.current = null;
+                    setDragX(0);
                   }}
-                  onPointerCancel={() => setPointerStart(null)}
+                  onPointerCancel={() => {
+                    pointerStart.current = null;
+                    setDragX(0);
+                  }}
                 >
-                  <GroupCard group={current} onOpen={onOpen} />
+                  <div
+                    className={`swipe-card ${dragX ? "dragging" : ""}`}
+                    style={{
+                      transform: `translateX(${dragX}px) rotate(${dragX / 25}deg)`,
+                    }}
+                  >
+                    {Math.abs(dragX) > 25 && (
+                      <span
+                        className={`swipe-stamp ${dragX > 0 ? "yes" : "no"}`}
+                      >
+                        {dragX > 0
+                          ? current.canRequest
+                            ? "LET’S GO"
+                            : "ALREADY CONNECTED"
+                          : "PASS"}
+                      </span>
+                    )}
+                    <GroupCard group={current} onOpen={onOpen} />
+                  </div>
                   <div className="swipe-actions">
                     <button
                       className="secondary"
@@ -600,7 +669,12 @@ export function MyTrips({ onOpen, onExplore }) {
           Refresh status
         </button>
       </div>
-      <RemoteState resource={requests} />
+      {!(groups.error && requests.error) && <RemoteState resource={requests} />}
+      {groups.error && requests.error && (
+        <p className="muted">
+          Your join requests will appear here when the connection is ready.
+        </p>
+      )}
       {requests.data &&
         (requests.data.requests.length ? (
           <div className="panel">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api } from "./api";
+import { api, isPreview } from "./api";
 import { Avatar, Notice, useResource } from "./components";
 import {
   Profile,
@@ -13,7 +13,14 @@ import {
 export default function App() {
   const catalog = useResource(api.catalog, "catalog");
   const session = useResource(api.session, "session");
-  const [page, setPage] = useState({ name: "home" });
+  const [page, setPage] = useState({
+    name: isPreview
+      ? new URLSearchParams(location.search).get("screen") || "home"
+      : "home",
+    id: isPreview
+      ? new URLSearchParams(location.search).get("group") || "preview-tokyo"
+      : undefined,
+  });
   const [profileOverride, setProfileOverride] = useState(null);
   const profile = profileOverride || session.data?.profile;
 
@@ -28,6 +35,36 @@ export default function App() {
 
   return (
     <>
+      {isPreview && (
+        <div className="preview-bar">
+          <div>
+            <strong>DESIGN PREVIEW</strong>
+            <span>
+              Example content · no real requests or bookings · matching is not
+              evaluated
+            </span>
+          </div>
+          <div className="preview-controls">
+            <button
+              onClick={() => {
+                sessionStorage.setItem("preview-role", "seeker");
+                location.reload();
+              }}
+            >
+              Seeker view
+            </button>
+            <button
+              onClick={() => {
+                sessionStorage.setItem("preview-role", "creator");
+                location.reload();
+              }}
+            >
+              Creator view
+            </button>
+            <a href="/">Exit preview ↗</a>
+          </div>
+        </div>
+      )}
       <header className="site-header">
         <div className="header-inner">
           <button
@@ -42,6 +79,11 @@ export default function App() {
             </span>
           </button>
           <span className="header-note">Find your people. Go together.</span>
+          {!isPreview && (
+            <a className="preview-link" href="?preview=1">
+              Explore design preview ↗
+            </a>
+          )}
           <button
             className="profile-button"
             aria-label={
@@ -77,6 +119,29 @@ export default function App() {
         </div>
       </nav>
       <main>
+        {isPreview && (
+          <nav className="preview-screens" aria-label="Preview screens">
+            {[
+              ["home", "Welcome"],
+              ["profile", "Profile"],
+              ["choose", "Choose a path"],
+              ["create", "Create group"],
+              ["discover", "Swipe discovery"],
+              ["trips", "My trips"],
+              ["group", "Shared group"],
+            ].map(([name, label]) => (
+              <button
+                key={name}
+                className={page.name === name ? "chosen" : ""}
+                onClick={() =>
+                  navigate(name, name === "group" ? "preview-tokyo" : undefined)
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
         {page.name === "home" && (
           <>
             <section className="hero">
@@ -157,6 +222,7 @@ export default function App() {
         )}
         {page.name === "profile" && (
           <Profile
+            key={profile?.id || "new-profile"}
             catalog={catalog}
             profile={profile}
             onSaved={(saved) => {
@@ -192,6 +258,7 @@ export default function App() {
         )}
         {page.name === "create" && (
           <TripForm
+            key={profile?.id || "new-trip"}
             catalog={catalog}
             mode="create"
             profile={profile}
@@ -224,7 +291,13 @@ export default function App() {
         )}
       </main>
       <footer>
-        Travel Together <span>Made for shared adventures.</span>
+        Travel Together{" "}
+        <span>
+          Made for shared adventures.{" "}
+          <a href="/visuals/credits.txt" target="_blank" rel="noreferrer">
+            Photo credits
+          </a>
+        </span>
       </footer>
     </>
   );

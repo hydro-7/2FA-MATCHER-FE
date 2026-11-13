@@ -189,6 +189,11 @@ export function Stays({ group, onChanged }) {
                         <button
                           className="secondary"
                           disabled={busy}
+                          aria-label={
+                            option.shortlisted
+                              ? "Remove from shortlist"
+                              : "Add to shortlist"
+                          }
                           onClick={() =>
                             action(() =>
                               option.shortlisted
@@ -197,9 +202,7 @@ export function Stays({ group, onChanged }) {
                             )
                           }
                         >
-                          {option.shortlisted
-                            ? "♥ Remove from shortlist"
-                            : "♡ Shortlist"}
+                          {option.shortlisted ? "♥ Saved" : "♡ Shortlist"}
                         </button>
                         <button
                           className="secondary"

@@ -1,8 +1,14 @@
 // Proposed API contract: agree these routes with the backend developer.
 // Keep integration changes here rather than spreading URLs throughout the UI.
 const baseUrl = import.meta.env.VITE_API_URL || "/api";
+export const isPreview =
+  new URLSearchParams(window.location.search).get("preview") === "1";
 
 async function request(path, method = "GET", body) {
+  if (isPreview) {
+    const { previewRequest } = await import("./preview");
+    return previewRequest(path, method, body);
+  }
   let response;
   try {
     response = await fetch(`${baseUrl}${path}`, {
@@ -19,12 +25,16 @@ async function request(path, method = "GET", body) {
   if (response.status === 204) return null;
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(
+    const error = new Error(
       data?.message ||
-        ([502, 503, 504].includes(response.status)
-          ? "The backend is unavailable. Start the API server and retry."
-          : `Request failed (${response.status}). Please try again.`),
+        (response.status === 404
+          ? "This part of the experience is waiting for its API connection. Explore the design preview while integration is in progress."
+          : [502, 503, 504].includes(response.status)
+            ? "The backend is unavailable. Start the API server and retry."
+            : `Request failed (${response.status}). Please try again.`),
     );
+    error.status = response.status;
+    throw error;
   }
   if (data === null)
     throw new Error("The server returned an unexpected response.");

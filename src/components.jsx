@@ -37,12 +37,19 @@ export function useResource(load, key) {
 
 export function Notice({ children, error = false }) {
   if (!children) return null;
+  const awaitingApi =
+    typeof children === "string" && children.includes("API connection");
   return (
     <div
-      className={`notice ${error ? "error" : ""}`}
-      role={error ? "alert" : "status"}
+      className={`notice ${error && !awaitingApi ? "error" : ""}`}
+      role={error && !awaitingApi ? "alert" : "status"}
     >
       {children}
+      {awaitingApi && (
+        <a className="inline-link" href="?preview=1">
+          Explore design preview →
+        </a>
+      )}
     </div>
   );
 }
@@ -57,7 +64,14 @@ export function RemoteState({ resource }) {
   if (resource.error)
     return (
       <div className="empty">
-        <h3>We couldn’t load this yet</h3>
+        <div className="empty-icon" aria-hidden="true">
+          ◎
+        </div>
+        <h3>
+          {resource.error.includes("API connection")
+            ? "Your next adventure is taking shape"
+            : "We couldn’t load this yet"}
+        </h3>
         <Notice error>{resource.error}</Notice>
         <button className="secondary" onClick={resource.reload}>
           Try again
@@ -128,6 +142,7 @@ export function Money({ value }) {
         ? new Intl.NumberFormat("en-IN", {
             style: "currency",
             currency: "INR",
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
           }).format(value)
         : "Price unavailable"}

@@ -625,6 +625,7 @@ fieldset p {
   background: white;
 }
 .group-cover {
+  overflow: hidden;
   height: 245px;
   background: linear-gradient(140deg, #174f85, #418d9a 60%, #9eb9a5);
   background-size: cover;
@@ -1243,5 +1244,760 @@ dialog::backdrop {
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;
+  }
+}
+
+/* Visual refinement: shared surfaces, readable hierarchy, generous touch targets. */
+.form-title {
+  font-size: 30px;
+  letter-spacing: -0.8px;
+  margin-bottom: 0;
+}
+:root {
+  background: #f7f8fa;
+  --navy: #003b95;
+  --line: #e1e7ef;
+}
+.site-header {
+  background: #003b95;
+}
+.brand-symbol {
+  background: #ffffff12;
+  border-radius: 13px 13px 13px 3px;
+}
+.brand {
+  letter-spacing: -0.8px;
+}
+.main-nav button {
+  font-weight: 600;
+}
+.main-nav button.active {
+  background: #edf5ff;
+  border-radius: 8px 8px 0 0;
+}
+.panel {
+  border-color: #e2e7ef;
+  box-shadow: 0 5px 22px #0b315205;
+}
+.eyebrow {
+  color: #56718f;
+  letter-spacing: 2px;
+}
+.hero {
+  gap: 65px;
+  padding-top: 34px;
+  padding-bottom: 65px;
+}
+.hero h1 {
+  letter-spacing: -2.8px;
+  font-weight: 750;
+}
+.hero p {
+  font-size: 18px;
+  max-width: 465px;
+  line-height: 1.75;
+}
+.hero .actions button {
+  padding: 15px 23px;
+  border-radius: 10px;
+}
+.travel-art {
+  height: 420px;
+  background: #dfebef;
+  border-radius: 110px 20px 20px 20px;
+  border: 8px solid white;
+  box-shadow: 0 12px 40px #1236570c;
+}
+.art-sun {
+  background: #ffc85c;
+  height: 120px;
+  width: 120px;
+  top: 45px;
+  right: 40px;
+}
+.art-label {
+  top: 33px;
+  left: 50px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+.art-mountain {
+  background: #54877e;
+  top: 160px;
+}
+.art-mountain.back {
+  background: #9ab9ad;
+}
+.art-ticket {
+  background: #fffdf7;
+  border: 0;
+  left: 22px;
+  right: 22px;
+  bottom: 22px;
+  padding: 24px;
+  box-shadow: 0 5px 20px #08275212;
+}
+.art-ticket strong {
+  font-size: 28px;
+  color: #082752;
+}
+.intro-grid {
+  gap: 28px;
+  padding-top: 28px;
+}
+.intro-grid article {
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.intro-grid article > span {
+  background: #fff1bd;
+  color: #6c5200;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+.intro-grid h3 {
+  font-size: 17px;
+}
+.page-heading {
+  margin: 8px 0 32px;
+}
+.page-heading h1 {
+  font-size: 43px;
+  letter-spacing: -1.8px;
+  margin-bottom: 12px;
+}
+.page-heading .lede {
+  font-size: 16px;
+}
+.form-layout .panel {
+  padding: 34px;
+}
+.form-layout aside h1 {
+  max-width: 370px;
+}
+.form-layout .aside-note {
+  border-radius: 0 10px 10px 0;
+  line-height: 1.7;
+}
+.field > span {
+  font-size: 12px;
+  color: #344b65;
+}
+.field input,
+.field select,
+.field textarea {
+  border-color: #c9d4e1;
+  background: #fff;
+  border-radius: 9px;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #006ce4;
+}
+.field small {
+  font-size: 11px;
+}
+.chip {
+  font-size: 12px;
+  padding: 8px 12px;
+  min-height: 36px;
+  background: white;
+}
+.chip.selected {
+  background: #fff3ca;
+  border-color: #efcd6d;
+  color: #654f12;
+}
+.interest-picker {
+  margin: 3px 0 23px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.interest-picker summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: #344b65;
+}
+.interest-picker summary span {
+  float: right;
+  background: #edf4ff;
+  color: var(--navy);
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 400;
+}
+.interest-picker .chips {
+  margin-top: 13px;
+}
+.discovery-layout {
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 46px;
+}
+.discovery-layout > section {
+  min-width: 0;
+}
+.discovery-layout aside {
+  align-self: start;
+}
+.discovery-layout aside .panel {
+  border-radius: 14px;
+}
+.discovery-layout aside .section-heading {
+  margin-bottom: 25px;
+}
+.discovery-layout aside .eyebrow {
+  font-size: 10px;
+}
+.discovery-layout aside .field {
+  gap: 7px;
+}
+.discovery-layout aside .form-grid {
+  gap: 15px;
+}
+.discovery-layout .filters {
+  background: transparent;
+  box-shadow: none;
+  padding: 14px 16px;
+}
+.discovery-layout .section-heading h2 {
+  font-size: 22px;
+}
+.swipe-area {
+  max-width: 620px;
+  margin: auto;
+  position: relative;
+  padding: 6px 10px;
+  overflow: clip;
+}
+.swipe-card {
+  position: relative;
+  cursor: grab;
+  will-change: transform;
+  user-select: none;
+}
+.swipe-card.dragging {
+  cursor: grabbing;
+}
+.swipe-card .group-card {
+  border-radius: 20px;
+  box-shadow: 0 10px 28px #12365712;
+}
+.group-cover {
+  position: relative;
+  isolation: isolate;
+  background: #315f6a;
+  padding: 28px;
+}
+.group-cover:not([style])::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(0deg, #082752cc, transparent 65%),
+    linear-gradient(135deg, #a2c3ba, #275d6e);
+  z-index: -2;
+}
+.group-cover:not([style])::after {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: #ffd28d;
+  opacity: 0.6;
+  right: -20px;
+  top: -70px;
+  box-shadow:
+    -140px 160px 0 70px #4a7c78,
+    80px 220px 0 80px #234e63;
+  z-index: -1;
+}
+.cover-label {
+  align-self: start;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #fff3d3;
+  margin-bottom: 10px;
+}
+.group-cover h2 {
+  color: white;
+  font-size: 33px;
+  letter-spacing: -1px;
+  max-width: 400px;
+  text-wrap: balance;
+}
+.card-body {
+  padding: 25px 28px;
+}
+.card-body .person {
+  margin-bottom: 16px;
+}
+.card-body > .muted {
+  font-size: 13px;
+  padding: 13px 0 0;
+  border-top: 1px solid var(--line);
+}
+.card-footer button {
+  border-radius: 8px;
+  font-size: 12px;
+}
+.card-footer strong {
+  color: #153d68;
+}
+.swipe-actions {
+  margin: 22px auto 0;
+  max-width: 470px;
+  gap: 16px;
+}
+.swipe-actions button {
+  min-height: 52px;
+  border-radius: 50px;
+}
+.swipe-actions button:first-child {
+  background: white;
+}
+.swipe-stamp {
+  position: absolute;
+  top: 35px;
+  left: 20px;
+  border: 3px solid currentColor;
+  background: #fffffff2;
+  padding: 8px 15px;
+  border-radius: 7px;
+  z-index: 2;
+  font-size: 21px;
+  letter-spacing: 2px;
+  font-weight: 800;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.swipe-stamp.yes {
+  color: #15744e;
+}
+.swipe-stamp.no {
+  color: #a34a37;
+}
+.notice {
+  line-height: 1.6;
+  border-radius: 10px;
+}
+.inline-link {
+  display: block;
+  font-weight: 700;
+  color: #003b95;
+  margin-top: 8px;
+}
+.empty {
+  padding: 35px 24px;
+  background: #fff;
+  border-style: solid;
+}
+.empty .notice {
+  max-width: 500px;
+  margin: 18px auto;
+  background: transparent;
+}
+.empty-icon {
+  display: grid;
+  place-items: center;
+  margin: 0 auto 18px;
+  height: 56px;
+  width: 56px;
+  border-radius: 50%;
+  background: #edf4ff;
+  font-size: 28px;
+}
+.bottom-callout {
+  background: #edf4fd;
+  border: 1px solid #dae7f8;
+  padding: 25px;
+}
+.detail-cover {
+  border-radius: 20px;
+  padding: 45px;
+  background: linear-gradient(115deg, #003b95, #1f6776);
+}
+.detail-cover .badge {
+  border-radius: 20px;
+  padding: 7px 13px;
+}
+.tabs {
+  gap: 30px;
+  margin-top: 9px;
+}
+.hotel-card {
+  grid-template-columns: 30% 1fr;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px #12365708;
+}
+.hotel-content {
+  padding: 26px;
+}
+.hotel-image {
+  min-height: 320px;
+}
+.rating {
+  border-radius: 8px 8px 8px 0;
+}
+.price-row.highlight {
+  color: #16477a;
+  background: #edf4fd;
+}
+.member-card {
+  background: white;
+  padding: 28px 18px;
+  border-radius: 14px;
+}
+.member-card .avatar {
+  margin-bottom: 5px;
+}
+.choice {
+  border-radius: 18px;
+  padding: 35px;
+  box-shadow: 0 6px 20px #12365705;
+}
+.choice:hover {
+  border-color: #80ace3;
+  filter: none;
+  background: #fbfdff;
+}
+.preview-link {
+  color: #fff1bd;
+  font-size: 12px;
+  text-decoration: none;
+  border-bottom: 1px solid #fff1bd66;
+  padding: 6px 0;
+}
+.preview-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px max(20px, calc((100vw - 1184px) / 2));
+  background: #fff4ce;
+  color: #5b460e;
+  font-size: 11px;
+  align-items: center;
+}
+.preview-bar > div:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.preview-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.preview-controls button {
+  background: transparent;
+  border: 1px solid #dcc68b;
+  color: #5b460e;
+  min-height: 32px;
+  padding: 4px 9px;
+  font-size: 11px;
+}
+.preview-controls a {
+  color: #5b460e;
+  margin-left: 5px;
+}
+.preview-screens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -15px 0 30px;
+  padding: 10px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.preview-screens button {
+  background: white;
+  color: #596579;
+  min-height: 36px;
+  font-size: 12px;
+  padding: 7px 12px;
+  font-weight: 400;
+}
+.preview-screens button.chosen {
+  color: var(--navy);
+  background: #edf4ff;
+  font-weight: 700;
+}
+footer a {
+  color: #596579;
+  margin-left: 9px;
+}
+@media (max-width: 1000px) {
+  .header-note {
+    display: none;
+  }
+  .discovery-layout {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .card-body {
+    padding: 22px;
+  }
+  .group-cover h2 {
+    font-size: 28px;
+  }
+  .hero {
+    gap: 30px;
+  }
+  .hero h1 {
+    font-size: 48px;
+  }
+  .hotel-card {
+    grid-template-columns: 28% 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .preview-bar {
+    flex-direction: column;
+    align-items: start;
+    padding: 10px 18px;
+    gap: 7px;
+  }
+  .preview-bar > div:first-child {
+    gap: 4px 10px;
+  }
+  .preview-controls {
+    width: 100%;
+  }
+  .preview-link {
+    font-size: 10px;
+    margin-left: auto;
+  }
+  .brand small {
+    display: none;
+  }
+  .header-inner {
+    gap: 9px;
+  }
+  .brand {
+    font-size: 17px;
+  }
+  .brand-symbol {
+    height: 33px;
+    width: 33px;
+    font-size: 24px;
+  }
+  .hero {
+    padding-top: 10px;
+    padding-bottom: 35px;
+    gap: 25px;
+  }
+  .hero h1 {
+    font-size: 42px;
+    letter-spacing: -1.8px;
+  }
+  .hero p {
+    font-size: 16px;
+  }
+  .hero .actions button {
+    padding: 12px 18px;
+  }
+  .travel-art {
+    height: 290px;
+    border-radius: 65px 15px 15px 15px;
+  }
+  .art-label {
+    left: 30px;
+    top: 22px;
+  }
+  .art-ticket {
+    padding: 18px;
+  }
+  .art-ticket strong {
+    font-size: 23px;
+  }
+  .intro-grid {
+    gap: 12px;
+  }
+  .intro-grid article {
+    padding: 18px;
+  }
+  .intro-grid article > span {
+    float: left;
+  }
+  .intro-grid h3,
+  .intro-grid p {
+    margin-left: 43px;
+  }
+  .page-heading h1 {
+    font-size: 34px;
+  }
+  .page-heading {
+    margin-bottom: 23px;
+  }
+  .form-layout .panel {
+    padding: 24px;
+  }
+  .discovery-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .discovery-layout.has-results > aside {
+    order: 2;
+  }
+  .discovery-layout.has-results > section {
+    order: 1;
+  }
+  .discovery-layout.has-results > aside .panel {
+    background: #fdfefe;
+  }
+  .swipe-area {
+    padding: 7px 8px;
+  }
+  .swipe-card .group-cover {
+    height: 230px;
+    padding: 24px;
+  }
+  .swipe-card .card-body {
+    padding: 20px;
+  }
+  .swipe-card .person {
+    flex-wrap: nowrap;
+    font-size: 12px;
+    gap: 8px;
+  }
+  .swipe-card .person .badge {
+    margin-left: auto;
+    font-size: 10px;
+    max-width: 98px;
+  }
+  .swipe-card .avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .card-body .chip {
+    font-size: 10px;
+    padding: 7px 9px;
+    min-height: 30px;
+  }
+  .card-footer strong {
+    font-size: 21px;
+  }
+  .card-footer small {
+    font-size: 10px;
+  }
+  .card-footer button {
+    padding: 10px 12px;
+  }
+  .swipe-actions {
+    margin-top: 17px;
+  }
+  .swipe-actions button {
+    font-size: 12px;
+  }
+  .discovery-layout > section > .section-heading h2 {
+    font-size: 20px;
+  }
+  .preview-screens {
+    margin-top: -8px;
+    padding: 6px;
+    gap: 4px;
+  }
+  .preview-screens button {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  .detail-cover {
+    padding: 28px;
+  }
+  .hotel-card {
+    grid-template-columns: 1fr;
+  }
+  .hotel-image {
+    min-height: 200px;
+    height: 200px;
+  }
+  .hotel-content {
+    padding: 22px;
+  }
+  .hotel-content .actions button {
+    flex: 1;
+  }
+  .hotel-content .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hotel-content .actions button:last-child {
+    grid-column: 1 / -1;
+  }
+  .bottom-callout {
+    padding: 22px;
+  }
+  .choice {
+    padding: 26px;
+  }
+  .form-layout aside h1 {
+    max-width: none;
+  }
+  .trip-grid .card-footer {
+    flex-direction: row;
+    align-items: center;
+  }
+  .trip-grid .card-footer strong {
+    font-size: 19px;
+  }
+  footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  footer span {
+    font-size: 10px;
+  }
+}
+@media (max-width: 400px) {
+  .hero h1 {
+    font-size: 37px;
+  }
+  .preview-link {
+    max-width: 84px;
+    line-height: 1.4;
+    border: 0;
+  }
+  .main-nav > div {
+    justify-content: space-between;
+  }
+  .profile-button {
+    min-height: 38px;
+  }
+  .brand {
+    gap: 7px;
+  }
+  .swipe-stamp {
+    font-size: 16px;
+  }
+  .card-footer {
+    gap: 9px;
+  }
+  .swipe-card .card-footer {
+    flex-wrap: nowrap;
+  }
+  .swipe-card .card-footer button {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .group-cover h2 {
+    font-size: 29px;
+  }
+  .hero-foot {
+    gap: 9px;
+    font-size: 10px;
   }
 }
