@@ -1,56 +1,54 @@
 # Travel Together — frontend
 
-Booking.com-inspired group travel matcher, built with React, JavaScript and Vite. This repository contains the frontend only.
+React + Vite client for the Group Travel Matcher. All data comes from the backend API. The app reads no data-pack files.
 
 ## Start
 
-Requires Node.js 22.16+ (or a newer supported Node.js release).
+Requires Node.js 22+ and the backend running on `http://localhost:8000`.
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173/?preview=1 for the complete, labelled design preview. Preview works without a backend, makes no API requests and resets its sample interactions on refresh. It is for visual review, not a real matching or booking demo. Use the toolbar to inspect creator/seeker journeys and all screens.
+Open http://localhost:5173. Vite proxies `/api` and `/images` to `VITE_BACKEND_ORIGIN` (see `.env.example`).
 
-Open http://localhost:5173/ for real API mode. Vite proxies `/api` to the teammate's backend configured by `VITE_BACKEND_ORIGIN`; copy `.env.example` to `.env` when changing the tunnel. The backend uses Neon; no local database or local API is required. Never put secrets in frontend environment variables.
+## Structure
 
-```sh
-npm run build
+```
+src/
+  config/      env.js (reads import.meta.env), endpoints.js (API routes), routes.js (page URLs)
+  constants/   data only: app settings, enum labels
+  lib/         http.js (fetch client), format.js (money, dates, labels, asset URLs)
+  store/       zustand: session (persisted traveller id), search results, toasts
+  services/    one per backend domain: meta, traveller, group, match, request, planning, message
+  hooks/       useResource (load/error/reload), useMeta (form options from /meta)
+  components/  ui primitives, GroupCard, SearchForm, IdentityModal, layout/
+  screens/     one file per route; screens/group/ holds the group tabs
 ```
 
-## Included
+Screens call services only, services call `http` with `API_ENDPOINTS`, and only `lib/http.js` uses `fetch`.
 
-- Profile setup, group creation, swipe/card/list discovery and filters.
-- Join requests and creator approvals, multiple group memberships with no exit action.
-- Shared group workspace, member profiles, hotel shortlisting, preference and comparison.
-- Booking review and confirmation UI, responsive desktop/mobile styling.
-- Explicit loading, empty and API-connection states.
+## Routes
 
-API mode is wired to the supplied Group Travel Matcher API contract. Create a new profile or use Switch traveller to select an existing traveller. Identity is stored locally and sent as `X-User-Id`, then verified through `/me`. The backend owns matching, availability, prices, approval and booking persistence. Saved profiles are read-only because the contract has no update route. A working backend tunnel is required for the real demo; preview is never used as a fallback.
+| Path | Screen |
+|---|---|
+| `/` | Home |
+| `/profile` | Sign up / your profile (M1) |
+| `/groups/new` | Create a group (M2) |
+| `/discover` | Search, matches, filters, near misses (M3, M4, G1) |
+| `/trips` | Your groups (pending badge) and sent requests |
+| `/groups/:id` | Overview and "I'm interested" (M5) |
+| `/groups/:id/members` | Members |
+| `/groups/:id/stays` | Hotels, per-person cost, shortlist, compare, confirm booking (M6) |
+| `/groups/:id/chat` | Group chat (S1) |
+| `/groups/:id/requests` | Approve / decline (M5, owner only) |
+| `/travellers/:id` | Member profile and their groups (G2) |
 
-## Easy-to-edit files
+## Known limitations
 
-- `src/App.jsx` — shell and navigation
-- `src/screens.jsx` — profile, discovery, group and request screens
-- `src/stays.jsx` — hotel workspace
-- `src/api.js` — live API adapter
-- `src/components.jsx` — shared controls
-- `src/style.css` — styling
-- `src/preview.js` and `src/preview-data/` — isolated visual examples
+- Identity is a demo session with no password, as M1 allows.
+- Profiles can't be edited because the API has no update route.
+- Chat refreshes by polling every few seconds.
 
-See `docs/FRONTEND_API.md` for proposed request/response shapes and `docs/UI-DESIGN.md` for UI behaviour. Those handoff notes describe paths in the original combined workspace; in this standalone repository, omit the `client/` prefix. Backend paths in those notes refer to the separate local starter, not files included here.
-
-Photo attribution is in `public/visuals/credits.txt`. Preview reference catalogs are unchanged copies of the supplied hackathon data files.
-
-## Commit and push
-
-When working in a standalone clone of this GitHub repository:
-
-```sh
-git add .
-git commit -m "Describe your frontend changes"
-git push origin main
-```
-
-When working in the original `C:\_Project_Files\Booking` workspace, use `scripts/push-frontend.ps1` from that workspace to publish only its `client/` directory while preserving frontend Git history.
+Hotel photo credits: linked in the footer, served from the data pack's `images/ATTRIBUTIONS.md`.

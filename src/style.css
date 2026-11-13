@@ -171,10 +171,6 @@ small {
   width: 49px;
   height: 49px;
 }
-.header-note {
-  font-size: 13px;
-  color: #d0e0ff;
-}
 .profile-button {
   display: flex;
   align-items: center;
@@ -600,24 +596,6 @@ fieldset p {
   font-weight: 700;
   border-radius: 6px;
 }
-.segmented {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 3px;
-  background: white;
-}
-.segmented button {
-  background: white;
-  color: var(--muted);
-  font-size: 12px;
-  min-height: 32px;
-  padding: 5px 10px;
-}
-.segmented button.chosen {
-  background: #eaf3ff;
-  color: var(--navy);
-}
 .group-card {
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -687,18 +665,6 @@ fieldset p {
 }
 .card-footer strong {
   font-size: 20px;
-}
-.swipe-area {
-  touch-action: pan-y;
-}
-.swipe-actions {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 14px;
-  margin-top: 18px;
-}
-.swipe-area > .caption {
-  text-align: center;
 }
 .filters {
   padding: 16px;
@@ -1004,9 +970,6 @@ dialog::backdrop {
   }
 }
 @media (max-width: 1000px) {
-  .header-note {
-    display: none;
-  }
   .hero {
     gap: 30px;
   }
@@ -1198,13 +1161,6 @@ dialog::backdrop {
     align-items: start;
     flex-wrap: wrap;
   }
-  .swipe-actions {
-    grid-template-columns: 1fr 1.4fr;
-  }
-  .swipe-actions button {
-    padding: 10px;
-    font-size: 13px;
-  }
   footer {
     margin: 0 18px;
     padding: 20px 0;
@@ -1328,9 +1284,6 @@ h3 {
   }
   .header-inner {
     gap: 8px;
-  }
-  .header-inner .preview-link {
-    display: none;
   }
   .site-header .brand small {
     display: none;
@@ -1566,26 +1519,6 @@ h3 {
 .discovery-layout .section-heading h2 {
   font-size: 22px;
 }
-.swipe-area {
-  max-width: 620px;
-  margin: auto;
-  position: relative;
-  padding: 6px 10px;
-  overflow: clip;
-}
-.swipe-card {
-  position: relative;
-  cursor: grab;
-  will-change: transform;
-  user-select: none;
-}
-.swipe-card.dragging {
-  cursor: grabbing;
-}
-.swipe-card .group-card {
-  border-radius: 20px;
-  box-shadow: 0 10px 28px #12365712;
-}
 .group-cover {
   position: relative;
   isolation: isolate;
@@ -1649,48 +1582,9 @@ h3 {
 .card-footer strong {
   color: #153d68;
 }
-.swipe-actions {
-  margin: 22px auto 0;
-  max-width: 470px;
-  gap: 16px;
-}
-.swipe-actions button {
-  min-height: 52px;
-  border-radius: 50px;
-}
-.swipe-actions button:first-child {
-  background: white;
-}
-.swipe-stamp {
-  position: absolute;
-  top: 35px;
-  left: 20px;
-  border: 3px solid currentColor;
-  background: #fffffff2;
-  padding: 8px 15px;
-  border-radius: 7px;
-  z-index: 2;
-  font-size: 21px;
-  letter-spacing: 2px;
-  font-weight: 800;
-  transform: rotate(-12deg);
-  pointer-events: none;
-}
-.swipe-stamp.yes {
-  color: #15744e;
-}
-.swipe-stamp.no {
-  color: #a34a37;
-}
 .notice {
   line-height: 1.6;
   border-radius: 10px;
-}
-.inline-link {
-  display: block;
-  font-weight: 700;
-  color: #003b95;
-  margin-top: 8px;
 }
 .empty {
   padding: 35px 24px;
@@ -1766,78 +1660,11 @@ h3 {
   filter: none;
   background: #fbfdff;
 }
-.preview-link {
-  color: #fff1bd;
-  font-size: 12px;
-  text-decoration: none;
-  border-bottom: 1px solid #fff1bd66;
-  padding: 6px 0;
-}
-.preview-bar {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 10px max(20px, calc((100vw - 1184px) / 2));
-  background: #fff4ce;
-  color: #5b460e;
-  font-size: 11px;
-  align-items: center;
-}
-.preview-bar > div:first-child {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-.preview-controls {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-shrink: 0;
-}
-.preview-controls button {
-  background: transparent;
-  border: 1px solid #dcc68b;
-  color: #5b460e;
-  min-height: 32px;
-  padding: 4px 9px;
-  font-size: 11px;
-}
-.preview-controls a {
-  color: #5b460e;
-  margin-left: 5px;
-}
-.preview-screens {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: -15px 0 30px;
-  padding: 10px;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-.preview-screens button {
-  background: white;
-  color: #596579;
-  min-height: 36px;
-  font-size: 12px;
-  padding: 7px 12px;
-  font-weight: 400;
-}
-.preview-screens button.chosen {
-  color: var(--navy);
-  background: #edf4ff;
-  font-weight: 700;
-}
 footer a {
   color: #596579;
   margin-left: 9px;
 }
 @media (max-width: 1000px) {
-  .header-note {
-    display: none;
-  }
   .discovery-layout {
     grid-template-columns: 300px minmax(0, 1fr);
     gap: 24px;
@@ -1859,22 +1686,6 @@ footer a {
   }
 }
 @media (max-width: 760px) {
-  .preview-bar {
-    flex-direction: column;
-    align-items: start;
-    padding: 10px 18px;
-    gap: 7px;
-  }
-  .preview-bar > div:first-child {
-    gap: 4px 10px;
-  }
-  .preview-controls {
-    width: 100%;
-  }
-  .preview-link {
-    font-size: 10px;
-    margin-left: auto;
-  }
   .brand small {
     display: none;
   }
@@ -1953,30 +1764,6 @@ footer a {
   .discovery-layout.has-results > aside .panel {
     background: #fdfefe;
   }
-  .swipe-area {
-    padding: 7px 8px;
-  }
-  .swipe-card .group-cover {
-    height: 230px;
-    padding: 24px;
-  }
-  .swipe-card .card-body {
-    padding: 20px;
-  }
-  .swipe-card .person {
-    flex-wrap: nowrap;
-    font-size: 12px;
-    gap: 8px;
-  }
-  .swipe-card .person .badge {
-    margin-left: auto;
-    font-size: 10px;
-    max-width: 98px;
-  }
-  .swipe-card .avatar {
-    width: 32px;
-    height: 32px;
-  }
   .card-body .chip {
     font-size: 10px;
     padding: 7px 9px;
@@ -1991,23 +1778,8 @@ footer a {
   .card-footer button {
     padding: 10px 12px;
   }
-  .swipe-actions {
-    margin-top: 17px;
-  }
-  .swipe-actions button {
-    font-size: 12px;
-  }
   .discovery-layout > section > .section-heading h2 {
     font-size: 20px;
-  }
-  .preview-screens {
-    margin-top: -8px;
-    padding: 6px;
-    gap: 4px;
-  }
-  .preview-screens button {
-    font-size: 11px;
-    padding: 6px 8px;
   }
   .detail-cover {
     padding: 28px;
@@ -2060,11 +1832,6 @@ footer a {
   .hero h1 {
     font-size: 37px;
   }
-  .preview-link {
-    max-width: 84px;
-    line-height: 1.4;
-    border: 0;
-  }
   .main-nav > div {
     justify-content: space-between;
   }
@@ -2074,18 +1841,8 @@ footer a {
   .brand {
     gap: 7px;
   }
-  .swipe-stamp {
-    font-size: 16px;
-  }
   .card-footer {
     gap: 9px;
-  }
-  .swipe-card .card-footer {
-    flex-wrap: nowrap;
-  }
-  .swipe-card .card-footer button {
-    font-size: 11px;
-    white-space: nowrap;
   }
   .group-cover h2 {
     font-size: 29px;
@@ -2094,4 +1851,77 @@ footer a {
     gap: 9px;
     font-size: 10px;
   }
+}
+
+.chip.failed {
+  border-color: #f2c4c4;
+  background: #fff4f4;
+  color: #a12020;
+}
+
+.count-badge {
+  margin-left: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #cc0000;
+  color: #fff;
+  font-size: 12px;
+}
+
+.toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  display: grid;
+  gap: 8px;
+}
+
+.toast {
+  max-width: 360px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+}
+
+.toast.error {
+  background: #cc0000;
+}
+
+.chat-log {
+  display: grid;
+  gap: 10px;
+  max-height: 420px;
+  min-height: 200px;
+  overflow-y: auto;
+  align-content: start;
+  margin-bottom: 12px;
+}
+
+.chat-message {
+  max-width: 75%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.chat-message.mine {
+  justify-self: end;
+  background: #eaf3ff;
+}
+
+.chat-message p {
+  margin: 2px 0 0;
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-form input {
+  flex: 1;
 }
