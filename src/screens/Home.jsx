@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createSearchParams, Link, useNavigate } from "react-router";
 import { BedDouble, CalendarDays, MapPin, PenSquare, Plus, Search, Users, Wallet } from "lucide-react";
-import { HERO_PHOTO } from "../constants/app";
+import { CITY_PHOTOS } from "../constants/app";
 import { ROUTES } from "../config/routes";
-import { formatDates } from "../lib/format";
 import { useMeta } from "../hooks/useMeta";
 import { useSession } from "../store/session";
 import { Swoosh } from "../components/Swoosh";
@@ -14,6 +13,38 @@ const STEPS = [
   { icon: Users, tone: "purple", title: "Find your people", text: "Get matched with travellers who share your vibe." },
   { icon: BedDouble, tone: "green", title: "Plan & book together", text: "Choose stays, split costs and manage your trip in one place." },
 ];
+
+const HERO_CITIES = ["Tokyo", "Kyoto", "Osaka", "Dubai", "Abu Dhabi"];
+
+function HeroPhotos() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const timer = window.setInterval(() => {
+      if (!document.hidden && !motion.matches) {
+        setActive((current) => (current + 1) % HERO_CITIES.length);
+      }
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <>
+      {HERO_CITIES.map((city, index) => (
+        <img
+          key={city}
+          className={`hero-slide${index === active ? " is-active" : ""}`}
+          src={CITY_PHOTOS[city]}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+        />
+      ))}
+      <span className="hero-city-label"><MapPin size={16} /> {HERO_CITIES[active]}</span>
+    </>
+  );
+}
 
 function SearchBar({ meta }) {
   const navigate = useNavigate();
@@ -102,17 +133,8 @@ export function Home() {
             </Link>
           </div>
         </div>
-        <div className="hero-photo" style={{ backgroundImage: `url("${HERO_PHOTO.SRC}")` }}>
-          {data && (
-            <div className="photo-chip">
-              <span>
-                <MapPin size={18} /> {data.cities.map((city) => city.name).join(" · ")}
-              </span>
-              <span>
-                <CalendarDays size={18} /> {formatDates(data.dateWindow.FIRST_CHECK_IN, data.dateWindow.LAST_CHECK_OUT)}
-              </span>
-            </div>
-          )}
+        <div className="hero-photo">
+          <HeroPhotos />
         </div>
         {data && <SearchBar meta={data} />}
       </section>
