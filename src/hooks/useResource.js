@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useResource(load, key) {
+// keepPrevious: show the last result while a changed key loads (sort, filter, page) instead of blanking the list.
+export function useResource(load, key, { keepPrevious = false } = {}) {
   const [state, setState] = useState({ data: null, loading: true, error: "" });
   const [version, setVersion] = useState(0);
   const previousKey = useRef(key);
@@ -10,7 +11,7 @@ export function useResource(load, key) {
     const sameResource = previousKey.current === key;
     previousKey.current = key;
     setState((current) => ({
-      data: sameResource ? current.data : null,
+      data: sameResource || keepPrevious ? current.data : null,
       loading: true,
       error: "",
     }));
@@ -30,7 +31,7 @@ export function useResource(load, key) {
 
   return {
     ...state,
-    data: previousKey.current === key ? state.data : null,
+    data: previousKey.current === key || keepPrevious ? state.data : null,
     reload: () => setVersion((value) => value + 1),
   };
 }

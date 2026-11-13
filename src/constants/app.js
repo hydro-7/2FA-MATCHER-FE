@@ -58,8 +58,6 @@ export const DISCOVER_SORTS = [
   { id: "DATES", label: "Earliest dates" },
 ];
 
-export const EMPTY_PROFILE = { name: "", homeCity: "", age: "", gender: "", genderPreference: "", interests: [], budget: "" };
-
 export const EMPTY_TRIP = { name: "", city: "", checkIn: "", checkOut: "", maxSize: "", budgetInr: "", summary: "" };
 
 export const TRAVEL_STYLES = ["Budget", "Comfort", "Explorer", "Slow"];
@@ -88,9 +86,3 @@ export const GROUP_TABS = [
   { path: "stays", label: "Hotels", membersOnly: true },
   { path: "requests", label: "Requests", ownerOnly: true },
 ];
-
-export const SIGN_UP_REASONS = {
-  [ROUTES.DISCOVER]: "explore groups",
-  [ROUTES.TRIPS]: "see your trips",
-  [ROUTES.NEW_GROUP]: "create a trip",
-};

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
-import { Bell, Moon, Sun, CalendarDays, House, LogIn, RefreshCw, Search, SquarePlus, UserRound, Users } from "lucide-react";
+import { Bell, Moon, Sun, CalendarDays, House, LogIn, LogOut, RefreshCw, Search, SquarePlus, UserRound, Users } from "lucide-react";
 import { CITY_PHOTO_CREDITS, HERO_PHOTO, NAV_ITEMS, PHOTO_CREDITS_PATH } from "../../constants/app";
 import { ROUTES } from "../../config/routes";
 import { assetUrl } from "../../lib/format";
@@ -10,7 +10,7 @@ import { travellerService } from "../../services/travellerService";
 import { useSession } from "../../store/session";
 import { useTheme } from "../../store/theme";
 import { useToasts } from "../../store/toast";
-import { IdentityModal } from "../IdentityModal";
+import { AuthModal } from "../AuthModal";
 
 const NAV_ICONS = {
   [ROUTES.HOME]: House,
@@ -57,16 +57,44 @@ function useSearchShortcut() {
   }, [navigate]);
 }
 
-function UserMenu({ profile, onSwitch }) {
+function UserMenu({ profile, onAuth }) {
   const [open, setOpen] = useState(false);
+  const signOut = useSession((state) => state.signOut);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [leaving, setLeaving] = useState(false);
+  const menu = useRef(null);
+  // Stays open until a click outside it or Escape; moving the cursor away does not close it.
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event) => !menu.current?.contains(event.target) && setOpen(false);
+    const onKey = (event) => event.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+  // Sign out only once Home is showing, so the route guard never asks this user to sign back in.
+  useEffect(() => {
+    if (!leaving || pathname !== ROUTES.HOME) return;
+    setLeaving(false);
+    signOut();
+  }, [leaving, pathname, signOut]);
   if (!profile)
     return (
-      <Link className="signup-btn" to={ROUTES.PROFILE}>
-        <LogIn size={18} /> Sign up
-      </Link>
+      <>
+        <button className="text-button" onClick={() => onAuth("signin")}>
+          Sign in
+        </button>
+        <button className="signup-btn" onClick={() => onAuth("signup")}>
+          <LogIn size={18} /> Sign up
+        </button>
+      </>
     );
   return (
-    <div className="me" onMouseLeave={() => setOpen(false)}>
+    <div className="me" ref={menu}>
       <button className="me-btn" aria-expanded={open} aria-label="Account menu" onClick={() => setOpen(!open)}>
         {profile.name.charAt(0).toUpperCase()}
       </button>
@@ -83,10 +111,19 @@ function UserMenu({ profile, onSwitch }) {
           <button
             onClick={() => {
               setOpen(false);
-              onSwitch();
+              onAuth("demo");
             }}
           >
             <RefreshCw size={16} /> Switch traveller
+          </button>
+          <button
+            onClick={() => {
+              setOpen(false);
+              setLeaving(true);
+              navigate(ROUTES.HOME);
+            }}
+          >
+            <LogOut size={16} /> Sign out
           </button>
         </div>
       )}
@@ -103,7 +140,8 @@ export function AppLayout() {
   const groups = useResource(() => (profile ? groupService.mine() : Promise.resolve([])), `${profile?.id}:${location.pathname}`);
   const pending = (groups.data ?? []).reduce((sum, group) => sum + (group.pendingRequestCount ?? 0), 0);
   const intended = location.state?.from?.split("?")[0];
-  const [switching, setSwitching] = useState(false);
+  const switching = useSession((state) => state.signInOpen);
+  const setSwitching = useSession((state) => state.setSignInOpen);
 
   return (
     <>
@@ -136,11 +174,11 @@ export function AppLayout() {
                 {pending > 0 && <span className="ping" />}
               </Link>
             )}
-            <UserMenu profile={profile} onSwitch={() => setSwitching(true)} />
+            <UserMenu profile={profile} onAuth={setSwitching} />
           </div>
         </div>
       </header>
-      {switching && <IdentityModal onClose={() => setSwitching(false)} />}
+      {switching && <AuthModal key={switching} initialTab={switching} onClose={() => setSwitching(false)} />}
       <main key={profile?.id}>
         <Outlet />
       </main>

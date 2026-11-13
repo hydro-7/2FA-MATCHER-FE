@@ -144,7 +144,7 @@ export function GroupLayout() {
 
         <aside className="group-side">
           <div className="side-card">
-            {match && <MatchPanel match={match} />}
+            {match && <MatchPanel match={match} interestLabel={interestLabel} />}
             <div className="side-price">
               <div>
                 <strong>{formatMoney(group.budgetInr)}</strong>
@@ -185,30 +185,39 @@ function AvatarStack({ people, max = 4 }) {
   );
 }
 
-function MatchPanel({ match }) {
-  const allPass = match.rules.every((rule) => rule.pass);
+function MatchPanel({ match, interestLabel }) {
+  const passed = match.rules.filter((rule) => rule.pass).length;
+  const allPass = passed === match.rules.length;
   const score = Math.round(match.score);
+  // Rule details carry raw interest ids (STREET_FOOD); show their labels instead.
+  const readable = (detail) => detail.replace(/\b[A-Z][A-Z_]{2,}\b/g, interestLabel);
   return (
     <div className={`match-panel ${allPass ? "" : "warn"}`}>
-      <div>
-        <h3>
-          <Zap size={20} fill="currentColor" /> {allPass ? "You’re a great match!" : "Not a full match"}
-        </h3>
-        <ul>
-          {match.rules.map((rule) => (
-            <li key={rule.id}>
-              {rule.pass ? <CircleCheck size={18} /> : <CircleX size={18} />}
-              <span>
-                {rule.label} <small>({rule.detail})</small>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="score-ring" style={{ "--score": score }}>
-        <strong>{score}%</strong>
-        <small>Match</small>
-      </div>
+      <header>
+        <div>
+          <h3>
+            <Zap size={20} fill="currentColor" /> {allPass ? "You’re a great match!" : "Not a full match"}
+          </h3>
+          <p>
+            {passed} of {match.rules.length} checks passed
+          </p>
+        </div>
+        <div className="score-ring" style={{ "--score": score }} title="How closely your interests, dates, budget and open seats line up">
+          <strong>{score}%</strong>
+          <small>Fit</small>
+        </div>
+      </header>
+      <ul>
+        {match.rules.map((rule) => (
+          <li key={rule.id}>
+            {rule.pass ? <CircleCheck size={18} /> : <CircleX size={18} />}
+            <span>
+              <strong>{rule.label}</strong>
+              <small>{readable(rule.detail)}</small>
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

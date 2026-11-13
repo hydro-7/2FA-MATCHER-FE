@@ -6,15 +6,19 @@ export const useSession = create(
   persist(
     (set) => ({
       userId: "",
+      token: "",
       profile: null,
       ready: false,
+      // false, "signin", "signup" or "demo": which tab of the auth popup is open.
+      signInOpen: false,
+      setSignInOpen: (signInOpen) => set({ signInOpen }),
       budget: "",
       setBudget: (budget) => set({ budget }),
-      signIn: (profile) => set({ userId: profile.id, profile, ready: true }),
-      switchTo: (userId) => set({ userId, profile: null, ready: !userId }),
+      // Sign-up and sign-in both return the profile with its token.
+      signIn: ({ token, ...profile }) => set({ userId: profile.id, token, profile, ready: true }),
       setProfile: (profile) => set({ profile, ready: true }),
-      signOut: () => set({ userId: "", profile: null, ready: true }),
+      signOut: () => set({ userId: "", token: "", profile: null, ready: true }),
     }),
-    { name: STORAGE_KEYS.SESSION, partialize: (state) => ({ userId: state.userId, budget: state.budget }) },
+    { name: STORAGE_KEYS.SESSION, partialize: (state) => ({ userId: state.userId, token: state.token, budget: state.budget }) },
   ),
 );
