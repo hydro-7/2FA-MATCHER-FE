@@ -2,7 +2,7 @@
 
 React app for travel groups, shared stays, cost splits, friends, maps and chat. Bookings are demo confirmations, without payments.
 
-Needs Node.js 24 LTS and Git. First run the [backend](https://github.com/Ajaybalajiprasad/2FA-MATCHER-BE) on port 8000 in a separate terminal.
+Needs Node.js 24 LTS and Git. Start the [backend](https://github.com/Ajaybalajiprasad/2FA-MATCHER-BE) on port 8000 in a separate terminal. For both apps in one clone, use the [combined repo](https://github.com/hydro-7/2FA-MATCHER-SUBMISSION).
 ```sh
 git clone https://github.com/hydro-7/2FA-MATCHER-FE.git
 cd 2FA-MATCHER-FE
