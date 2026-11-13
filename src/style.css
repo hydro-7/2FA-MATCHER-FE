@@ -1248,6 +1248,80 @@ dialog::backdrop {
 }
 
 /* Visual refinement: shared surfaces, readable hierarchy, generous touch targets. */
+.switch-button {
+  background: transparent;
+  border: 1px solid #ffffff55;
+  color: white;
+  font-size: 12px;
+  padding: 9px 12px;
+}
+.hotel-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  margin: 15px 0 22px;
+}
+.hotel-filters .field {
+  margin: 0;
+  flex: 1;
+  min-width: 185px;
+}
+.near-misses {
+  margin-top: 24px;
+}
+.near-misses summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--navy);
+}
+.near-misses article {
+  padding: 17px 0;
+  border-top: 1px solid var(--line);
+}
+.near-misses p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 12px;
+}
+.profile-fields:disabled {
+  opacity: 0.9;
+}
+.profile-fields:disabled input,
+.profile-fields:disabled select {
+  color: #344b65;
+  background: #f6f8fb;
+}
+.pagination {
+  justify-content: center;
+  margin-top: 20px;
+}
+@media (max-width: 760px) {
+  .switch-button {
+    font-size: 10px;
+    padding: 7px;
+    min-height: 38px;
+    max-width: 66px;
+  }
+  .header-inner {
+    gap: 8px;
+  }
+  .header-inner .preview-link {
+    display: none;
+  }
+  .site-header .brand small {
+    display: none;
+  }
+  .hotel-filters {
+    padding: 16px;
+  }
+  .near-misses summary {
+    font-size: 13px;
+  }
+}
 .form-title {
   font-size: 30px;
   letter-spacing: -0.8px;

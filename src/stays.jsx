@@ -4,6 +4,7 @@ import {
   dates,
   Empty,
   Modal,
+  Field,
   Money,
   Notice,
   RemoteState,
@@ -11,7 +12,15 @@ import {
 } from "./components";
 
 export function Stays({ group, onChanged }) {
-  const resource = useResource(() => api.hotels(group.id), group.id);
+  const [filters, setFilters] = useState({
+    sort: "price",
+    minStars: "",
+    page: 1,
+  });
+  const resource = useResource(
+    () => api.hotels(group.id, filters),
+    `${group.id}-${filters.sort}-${filters.minStars}-${filters.page}`,
+  );
   const [compare, setCompare] = useState([]);
   const [selected, setSelected] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -28,6 +37,7 @@ export function Stays({ group, onChanged }) {
       resource.reload();
     } catch (failure) {
       setError(failure.message);
+      if (failure.status === 409) resource.reload();
     } finally {
       setBusy(false);
     }
@@ -37,12 +47,15 @@ export function Stays({ group, onChanged }) {
     setBusy(true);
     setError("");
     try {
-      const result = await api.finalize(group.id, selected.id);
+      const result = await api.finalize(group.id, selected.id, group);
       setConfirmation(result.booking);
       setSelected(null);
+      setCompare([]);
       resource.reload();
     } catch (failure) {
       setError(failure.message);
+      resource.reload();
+      if (failure.status === 409) setSelected(null);
     } finally {
       setBusy(false);
     }
@@ -83,6 +96,43 @@ export function Stays({ group, onChanged }) {
         </button>
       </div>
       <Notice error>{error}</Notice>
+      {!booking && (
+        <div className="hotel-filters">
+          <Field label="Sort stays">
+            <select
+              value={filters.sort}
+              onChange={(event) => {
+                setFilters({ ...filters, sort: event.target.value, page: 1 });
+                setCompare([]);
+              }}
+            >
+              <option value="price">Lowest total price</option>
+              <option value="rating">Highest guest rating</option>
+              <option value="stars">Hotel stars</option>
+            </select>
+          </Field>
+          <Field label="Minimum hotel stars">
+            <select
+              value={filters.minStars}
+              onChange={(event) => {
+                setFilters({
+                  ...filters,
+                  minStars: event.target.value,
+                  page: 1,
+                });
+                setCompare([]);
+              }}
+            >
+              <option value="">All hotel classes</option>
+              {[1, 2, 3, 4, 5].map((stars) => (
+                <option key={stars} value={stars}>
+                  {stars}+ stars
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+      )}
       <RemoteState resource={resource} />
       {booking && (
         <div className="booking-success">
@@ -141,7 +191,8 @@ export function Stays({ group, onChanged }) {
               </p>
             </div>
             <span className="badge">
-              {data.options.filter((option) => option.shortlisted).length}{" "}
+              {data.savedCount ??
+                data.options.filter((option) => option.shortlisted).length}{" "}
               shortlisted
             </span>
           </div>
@@ -171,6 +222,12 @@ export function Stays({ group, onChanged }) {
                         )}
                       </div>
                       <p>{option.roomDescription}</p>
+                      {option.available === false && (
+                        <Notice>
+                          This saved option is no longer available for the full
+                          group. Choose another stay.
+                        </Notice>
+                      )}
                       <div className="chips">
                         {option.amenities?.map((amenity) => (
                           <span className="chip" key={amenity}>
@@ -206,7 +263,11 @@ export function Stays({ group, onChanged }) {
                         </button>
                         <button
                           className="secondary"
-                          disabled={busy || option.isPreferred}
+                          disabled={
+                            busy ||
+                            option.isPreferred ||
+                            option.available === false
+                          }
                           onClick={() =>
                             action(() => api.prefer(group.id, option.id))
                           }
@@ -216,7 +277,7 @@ export function Stays({ group, onChanged }) {
                             : "Prefer this stay"}
                         </button>
                         <button
-                          disabled={busy}
+                          disabled={busy || option.available === false}
                           onClick={() => setSelected(option)}
                         >
                           Review & book
@@ -262,12 +323,42 @@ export function Stays({ group, onChanged }) {
                           <p className="muted">
                             {option.amenities?.join(" · ")}
                           </p>
-                          <button onClick={() => setSelected(option)}>
+                          <button
+                            disabled={busy || option.available === false}
+                            onClick={() => setSelected(option)}
+                          >
                             Review stay
                           </button>
                         </article>
                       ))}
                   </div>
+                </div>
+              )}
+              {data.total > data.limit && (
+                <div className="actions pagination">
+                  <button
+                    className="secondary"
+                    disabled={busy || filters.page === 1}
+                    onClick={() => {
+                      setFilters({ ...filters, page: filters.page - 1 });
+                      setCompare([]);
+                    }}
+                  >
+                    Previous page
+                  </button>
+                  <span>
+                    Page {data.page} of {Math.ceil(data.total / data.limit)}
+                  </span>
+                  <button
+                    className="secondary"
+                    disabled={busy || data.page * data.limit >= data.total}
+                    onClick={() => {
+                      setFilters({ ...filters, page: filters.page + 1 });
+                      setCompare([]);
+                    }}
+                  >
+                    Next page
+                  </button>
                 </div>
               )}
             </>

@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { api, isPreview } from "./api";
+import { useEffect, useState } from "react";
+import { api, isPreview, setUserId } from "./api";
+import Identity from "./Identity";
 import { Avatar, Notice, useResource } from "./components";
 import {
   Profile,
@@ -12,7 +13,9 @@ import {
 
 export default function App() {
   const catalog = useResource(api.catalog, "catalog");
-  const session = useResource(api.session, "session");
+  const [identityVersion, setIdentityVersion] = useState(0);
+  const session = useResource(api.session, `session-${identityVersion}`);
+  const [switching, setSwitching] = useState(false);
   const [page, setPage] = useState({
     name: isPreview
       ? new URLSearchParams(location.search).get("screen") || "home"
@@ -23,6 +26,18 @@ export default function App() {
   });
   const [profileOverride, setProfileOverride] = useState(null);
   const profile = profileOverride || session.data?.profile;
+  useEffect(() => {
+    function identityChanged(event) {
+      if (!isPreview && event.key === "travel-matcher-user-id") {
+        setProfileOverride(null);
+        setIdentityVersion((value) => value + 1);
+        setSwitching(false);
+        setPage({ name: "home" });
+      }
+    }
+    window.addEventListener("storage", identityChanged);
+    return () => window.removeEventListener("storage", identityChanged);
+  }, []);
 
   function navigate(name, id) {
     setPage({ name, id });
@@ -87,15 +102,36 @@ export default function App() {
           <button
             className="profile-button"
             aria-label={
-              profile ? `${profile.name}, edit profile` : "Your profile"
+              profile ? `${profile.name}, view profile` : "Your profile"
             }
             onClick={() => navigate("profile")}
           >
             <Avatar person={profile} />
             <span>{profile?.name || "Your profile"}</span>
           </button>
+          {!isPreview && (
+            <button
+              className="switch-button"
+              onClick={() => setSwitching(true)}
+            >
+              Switch traveller
+            </button>
+          )}
         </div>
       </header>
+      {switching && (
+        <Identity
+          current={profile}
+          onClose={() => setSwitching(false)}
+          onSelect={(id) => {
+            setUserId(id);
+            setProfileOverride(null);
+            setIdentityVersion((value) => value + 1);
+            setSwitching(false);
+            navigate(id ? "trips" : "profile");
+          }}
+        />
+      )}
       <nav className="main-nav" aria-label="Main navigation">
         <div>
           <button
@@ -118,7 +154,7 @@ export default function App() {
           </button>
         </div>
       </nav>
-      <main>
+      <main key={identityVersion}>
         {isPreview && (
           <nav className="preview-screens" aria-label="Preview screens">
             {[

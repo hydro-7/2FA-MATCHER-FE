@@ -13,7 +13,7 @@ npm run dev
 
 Open http://localhost:5173/?preview=1 for the complete, labelled design preview. Preview works without a backend, makes no API requests and resets its sample interactions on refresh. It is for visual review, not a real matching or booking demo. Use the toolbar to inspect creator/seeker journeys and all screens.
 
-Open http://localhost:5173/ for real API mode. Vite proxies `/api` to http://localhost:3001. Configure `VITE_API_URL` in `.env` for a different backend; see `.env.example`. Never put secrets in frontend environment variables.
+Open http://localhost:5173/ for real API mode. Vite proxies `/api` to the teammate's backend configured by `VITE_BACKEND_ORIGIN`; copy `.env.example` to `.env` when changing the tunnel. The backend uses Neon; no local database or local API is required. Never put secrets in frontend environment variables.
 
 ```sh
 npm run build
@@ -27,7 +27,7 @@ npm run build
 - Booking review and confirmation UI, responsive desktop/mobile styling.
 - Explicit loading, empty and API-connection states.
 
-API mode needs the agreed backend endpoints. The separate local starter currently implements onboarding/catalog only; group matching and hotel integration remain pending. No real matching, availability or pricing is calculated in this frontend.
+API mode is wired to the supplied Group Travel Matcher API contract. Create a new profile or use Switch traveller to select an existing traveller. Identity is stored locally and sent as `X-User-Id`, then verified through `/me`. The backend owns matching, availability, prices, approval and booking persistence. Saved profiles are read-only because the contract has no update route. A working backend tunnel is required for the real demo; preview is never used as a fallback.
 
 ## Easy-to-edit files
 

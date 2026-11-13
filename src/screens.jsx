@@ -43,6 +43,10 @@ export function Profile({ catalog, profile, onSaved }) {
   }
   async function submit(event) {
     event.preventDefault();
+    if (profile && !isPreview) {
+      onSaved(profile);
+      return;
+    }
     setBusy(true);
     setError("");
     try {
@@ -83,76 +87,92 @@ export function Profile({ catalog, profile, onSaved }) {
           Tell your future travel companions a little about yourself.
         </p>
         <RemoteState resource={catalog} />
+        {profile && !isPreview && (
+          <Notice>
+            Your profile is saved. Use Switch traveller to create or choose
+            another profile.
+          </Notice>
+        )}
         <form onSubmit={submit}>
-          <div className="form-grid">
-            <Field label="Your name">
-              <input
-                required
-                maxLength={100}
-                value={form.name}
-                onChange={(e) => change("name", e.target.value)}
-                autoComplete="name"
-              />
-            </Field>
-            <Field label="Home city">
-              <input
-                required
-                maxLength={100}
-                value={form.homeCity}
-                list="home-cities"
-                onChange={(e) => change("homeCity", e.target.value)}
-              />
-              <datalist id="home-cities">
-                {catalog.data?.homeCities?.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.label}
-                  </option>
-                ))}
-              </datalist>
-            </Field>
-            <Field label="Age (optional)">
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={form.age}
-                onChange={(e) => change("age", e.target.value)}
-              />
-            </Field>
-            <Field label="Gender">
+          <fieldset
+            disabled={Boolean(profile) && !isPreview}
+            className="profile-fields"
+          >
+            <div className="form-grid">
+              <Field label="Your name">
+                <input
+                  required
+                  maxLength={100}
+                  value={form.name}
+                  onChange={(e) => change("name", e.target.value)}
+                  autoComplete="name"
+                />
+              </Field>
+              <Field label="Home city">
+                <input
+                  required
+                  maxLength={100}
+                  value={form.homeCity}
+                  list="home-cities"
+                  onChange={(e) => change("homeCity", e.target.value)}
+                />
+                <datalist id="home-cities">
+                  {catalog.data?.homeCities?.map((city) => (
+                    <option key={city.id} value={city.id}>
+                      {city.label}
+                    </option>
+                  ))}
+                </datalist>
+              </Field>
+              <Field label="Age (optional)">
+                <input
+                  type="number"
+                  min="18"
+                  max="100"
+                  step="1"
+                  value={form.age}
+                  onChange={(e) => change("age", e.target.value)}
+                />
+              </Field>
+              <Field label="Gender">
+                <CatalogSelect
+                  required
+                  options={catalog.data?.genders}
+                  value={form.gender}
+                  onChange={(e) => change("gender", e.target.value)}
+                />
+              </Field>
+            </div>
+            <Field
+              label="Travel group gender preference"
+              hint="Same gender only means female-only for women and male-only for men."
+            >
               <CatalogSelect
                 required
-                options={catalog.data?.genders}
-                value={form.gender}
-                onChange={(e) => change("gender", e.target.value)}
+                options={catalog.data?.genderPreferences}
+                value={form.genderPreference}
+                onChange={(e) => change("genderPreference", e.target.value)}
               />
             </Field>
-          </div>
-          <Field
-            label="Travel group gender preference"
-            hint="Same gender only means female-only for women and male-only for men."
-          >
-            <CatalogSelect
-              required
-              options={catalog.data?.genderPreferences}
-              value={form.genderPreference}
-              onChange={(e) => change("genderPreference", e.target.value)}
-            />
-          </Field>
-          <fieldset>
-            <legend>Your interests</legend>
-            <p className="muted">
-              Choose the things you’d love to share on your trip.
-            </p>
-            <Chips
-              options={catalog.data?.interests}
-              selected={form.interests}
-              onChange={(values) => change("interests", values)}
-            />
+            <fieldset>
+              <legend>Your interests</legend>
+              <p className="muted">
+                Choose the things you’d love to share on your trip.
+              </p>
+              <Chips
+                options={catalog.data?.interests}
+                selected={form.interests}
+                onChange={(values) => change("interests", values)}
+              />
+            </fieldset>
           </fieldset>
           <Notice error>{error}</Notice>
           <button className="full" disabled={busy || !catalog.data}>
-            {busy ? "Saving profile…" : "Save & continue →"}
+            {busy
+              ? "Saving profile…"
+              : profile && !isPreview
+                ? "Continue with this profile →"
+                : "Save & continue →"}
           </button>
         </form>
       </div>
@@ -184,6 +204,10 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
     setError("");
     if (form.checkOut <= form.checkIn) {
       setError("Check-out must be after check-in.");
+      return;
+    }
+    if (!create && !form.interests.length) {
+      setError("Choose at least one trip interest.");
       return;
     }
     setBusy(true);
@@ -226,7 +250,7 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
           <Field label="Group name">
             <input
               required
-              maxLength={120}
+              maxLength={100}
               placeholder="Give your adventure a name"
               value={form.name}
               onChange={(e) => change("name", e.target.value)}
@@ -250,7 +274,7 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
               required
               type="number"
               min="1"
-              step="0.01"
+              step="1"
               value={form.budget}
               onChange={(e) => change("budget", e.target.value)}
             />
@@ -287,9 +311,17 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
               />
             </Field>
           )}
-          <Field label="Group gender preference">
+          <Field
+            label="Group gender preference"
+            hint={
+              create
+                ? "Uses the creator’s saved profile preference."
+                : undefined
+            }
+          >
             <CatalogSelect
               required
+              disabled={create}
               options={catalog.data?.genderPreferences}
               value={form.genderPreference}
               onChange={(e) => change("genderPreference", e.target.value)}
@@ -304,7 +336,7 @@ export function TripForm({ catalog, mode, profile, onCreated, onSearch }) {
             <textarea
               required
               rows={4}
-              maxLength={5000}
+              maxLength={2000}
               value={form.itinerary}
               onChange={(e) => change("itinerary", e.target.value)}
             />
@@ -350,6 +382,7 @@ export function Discover({ catalog, profile, onOpen }) {
   const [interests, setInterests] = useState([]);
   const [composition, setComposition] = useState("");
   const [criteria, setCriteria] = useState(null);
+  const [nearMisses, setNearMisses] = useState([]);
   const pointerStart = useRef(null);
   const [dragX, setDragX] = useState(0);
   const [feedback, setFeedback] = useState("");
@@ -361,12 +394,16 @@ export function Discover({ catalog, profile, onOpen }) {
         .catch((failure) => setError(failure.message));
   }, []);
   async function search(values) {
+    setResults(null);
+    setNearMisses([]);
+    setFeedback("");
     const response = await api.searchGroups({
       ...values,
       sharedInterestIds: interests,
       genderComposition: composition,
     });
     setResults(response.groups);
+    setNearMisses(response.nearMisses || []);
     setCriteria(values);
     setIndex(0);
     setError("");
@@ -399,12 +436,13 @@ export function Discover({ catalog, profile, onOpen }) {
           ? "Preview request sent. Try the creator view to explore approvals."
           : "Request sent. You’ll join once the creator approves.",
       );
-      setResults((current) =>
-        current.map((item) =>
-          item.id === group.id
-            ? { ...item, canRequest: false, requestStatus: "pending" }
-            : item,
-        ),
+      setResults(
+        (current) =>
+          current?.map((item) =>
+            item.id === group.id
+              ? { ...item, canRequest: false, requestStatus: "pending" }
+              : item,
+          ) || null,
       );
     } catch (failure) {
       setError(failure.message);
@@ -483,13 +521,15 @@ export function Discover({ catalog, profile, onOpen }) {
                   selected={interests}
                   onChange={setInterests}
                 />
-                <Field label="Gender composition">
-                  <CatalogSelect
-                    options={catalog.data?.genderCompositions}
-                    value={composition}
-                    onChange={(e) => setComposition(e.target.value)}
-                  />
-                </Field>
+                {catalog.data?.genderCompositions?.length > 0 && (
+                  <Field label="Gender composition">
+                    <CatalogSelect
+                      options={catalog.data?.genderCompositions}
+                      value={composition}
+                      onChange={(e) => setComposition(e.target.value)}
+                    />
+                  </Field>
+                )}
                 <div className="actions">
                   <button disabled={sending} onClick={filter}>
                     Apply filters
@@ -630,6 +670,25 @@ export function Discover({ catalog, profile, onOpen }) {
                   Switch to List to revisit groups, or change your search.
                 </Empty>
               )}
+              {nearMisses.length > 0 && (
+                <details className="panel near-misses">
+                  <summary>
+                    Other groups: why they don’t match ({nearMisses.length})
+                  </summary>
+                  <p className="caption">
+                    These are not compatible matches. All six rules must pass
+                    before you can request to join.
+                  </p>
+                  {nearMisses.map((group) => (
+                    <article key={group.groupId}>
+                      <h3>{group.name}</h3>
+                      {group.suggestions?.map((suggestion) => (
+                        <p key={suggestion.rule}>{suggestion.suggestion}</p>
+                      ))}
+                    </article>
+                  ))}
+                </details>
+              )}
             </>
           )}
         </section>
@@ -665,7 +724,13 @@ export function MyTrips({ onOpen, onExplore }) {
         ))}
       <div className="section-heading">
         <h2>Your join requests</h2>
-        <button className="secondary" onClick={requests.reload}>
+        <button
+          className="secondary"
+          onClick={() => {
+            requests.reload();
+            groups.reload();
+          }}
+        >
           Refresh status
         </button>
       </div>
@@ -760,6 +825,9 @@ export function GroupDetail({ id, onMember, onBack }) {
                 <span className="badge">You’re the creator</span>
               )}
               {group.isMember && <span className="badge">Your group</span>}
+              {group.status === "BOOKED" && (
+                <span className="badge">Stay confirmed · booking locked</span>
+              )}
             </div>
           </div>
           <div className="tabs" role="tablist" aria-label="Group sections">
@@ -990,11 +1058,17 @@ export function MemberProfile({ id, onOpen }) {
           </div>
           <h2>Groups they’re part of</h2>
           <div className="group-list">
-            {member.groups.map((group) => (
+            {member.groups?.map((group) => (
               <GroupCard key={group.id} group={group} onOpen={onOpen} />
             ))}
           </div>
-          {!member.groups.length && (
+          {member.groups === null && (
+            <p className="muted">
+              Group memberships are available to the selected traveller in My
+              trips.
+            </p>
+          )}
+          {member.groups?.length === 0 && (
             <Empty title="Adventures still to come">
               This traveller hasn’t joined a group yet.
             </Empty>
