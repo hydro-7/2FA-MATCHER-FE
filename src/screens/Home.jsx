@@ -75,19 +75,23 @@ function SearchBar({ meta }) {
           <CalendarDays size={20} />
         </span>
         <span className="field-body">
-          <small>Travel dates</small>
           <span className="date-range">
-            <input required type="date" aria-label="Check-in" min={FIRST_CHECK_IN} max={LAST_CHECK_OUT} value={form.checkIn} onChange={change("checkIn")} />
-            <span>–</span>
-            <input
-              required
-              type="date"
-              aria-label="Check-out"
-              min={form.checkIn || FIRST_CHECK_IN}
-              max={LAST_CHECK_OUT}
-              value={form.checkOut}
-              onChange={change("checkOut")}
-            />
+            <label className="date-endpoint">
+              <small>From</small>
+              <input required type="date" aria-label="From date" min={FIRST_CHECK_IN} max={LAST_CHECK_OUT} value={form.checkIn} onChange={change("checkIn")} />
+            </label>
+            <label className="date-endpoint">
+              <small>To</small>
+              <input
+                required
+                type="date"
+                aria-label="To date"
+                min={form.checkIn || FIRST_CHECK_IN}
+                max={LAST_CHECK_OUT}
+                value={form.checkOut}
+                onChange={change("checkOut")}
+              />
+            </label>
           </span>
         </span>
       </div>
