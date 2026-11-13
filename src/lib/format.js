@@ -5,6 +5,7 @@ import { LABELS } from "../constants/labels";
 const money = new Intl.NumberFormat(LOCALE, {
   style: "currency",
   currency: CURRENCY,
+  minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
 
@@ -21,6 +22,13 @@ function formatDate(value) {
 }
 
 export const formatDates = (start, end) => `${formatDate(start)} – ${formatDate(end)}`;
+
+const DAY_MS = 86_400_000;
+export const nightsBetween = (start, end) => Math.round((Date.parse(end) - Date.parse(start)) / DAY_MS);
+
+export const addDays = (date, days) => new Date(Date.parse(`${date}T00:00:00Z`) + days * DAY_MS).toISOString().slice(0, 10);
+
+export const formatDay = (date) => new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 
 export const formatTime = (iso) =>
   new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });

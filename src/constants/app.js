@@ -25,16 +25,61 @@ export const LIMITS = {
   MAX_AGE: 100,
 };
 
+export const BUDGET_SLIDER = { MIN: 10000, MAX: 300000, STEP: 1000 };
+
 export const NAV_ITEMS = [
-  { to: ROUTES.DISCOVER, label: "◎ Discover groups" },
-  { to: ROUTES.TRIPS, label: "▧ My trips" },
-  { to: ROUTES.NEW_GROUP, label: "＋ Create a group" },
+  { to: ROUTES.HOME, label: "Home" },
+  { to: ROUTES.DISCOVER, label: "Groups" },
+  { to: ROUTES.TRIPS, label: "My Trips" },
+  { to: ROUTES.NEW_GROUP, label: "Create Trip" },
 ];
 
-export const GROUP_TABS = [
-  { path: "", label: "overview" },
-  { path: "stays", label: "stays", membersOnly: true },
-  { path: "chat", label: "chat", membersOnly: true },
-  { path: "members", label: "members" },
-  { path: "requests", label: "requests", ownerOnly: true },
+// Decorative covers keyed by catalog city name; unknown cities fall back to HERO_PHOTO.
+export const CITY_PHOTOS = {
+  Kyoto: "/cities/kyoto.jpg",
+  Tokyo: "/cities/tokyo.jpg",
+  Osaka: "/cities/osaka.jpg",
+  Dubai: "/cities/dubai.jpg",
+  "Abu Dhabi": "/cities/abu-dhabi.jpg",
+};
+
+export const CITY_PHOTO_CREDITS = "/cities/CREDITS.txt";
+
+export const DISCOVER_SORTS = [
+  { id: "BEST", label: "Best match" },
+  { id: "BUDGET", label: "Lowest budget" },
+  { id: "DATES", label: "Earliest dates" },
 ];
+
+export const TRAVEL_STYLES = ["Budget", "Comfort", "Explorer", "Slow"];
+
+export const RULE_SUGGESTIONS = ["Respect each other", "Be on time", "Share expenses equally"];
+
+export const MY_TRIP_TABS = [
+  { id: "all", label: "All Trips" },
+  { id: "created", label: "Created" },
+  { id: "joined", label: "Joined" },
+  { id: "requests", label: "Requests" },
+];
+
+export const SEARCH_DEBOUNCE_MS = 400;
+
+export const HERO_PHOTO = {
+  SRC: "/hero/chureito-pagoda.jpg",
+  CREDITS: "/hero/CREDITS.txt",
+};
+
+export const GROUP_TABS = [
+  { path: "", label: "Overview", memberLabel: "Workspace" },
+  { path: "itinerary", label: "Itinerary" },
+  { path: "members", label: "Members" },
+  { path: "stays", label: "Hotels", membersOnly: true },
+  { path: "chat", label: "Chat", membersOnly: true },
+  { path: "requests", label: "Requests", ownerOnly: true },
+];
+
+export const SIGN_UP_REASONS = {
+  [ROUTES.DISCOVER]: "explore groups",
+  [ROUTES.TRIPS]: "see your trips",
+  [ROUTES.NEW_GROUP]: "create a trip",
+};

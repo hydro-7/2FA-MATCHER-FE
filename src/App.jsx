@@ -10,6 +10,7 @@ import { MyTrips } from "./screens/MyTrips";
 import { MemberProfile } from "./screens/MemberProfile";
 import { GroupLayout } from "./screens/group/GroupLayout";
 import { Overview } from "./screens/group/Overview";
+import { Itinerary } from "./screens/group/Itinerary";
 import { Members } from "./screens/group/Members";
 import { Stays } from "./screens/group/Stays";
 import { Chat } from "./screens/group/Chat";
@@ -33,6 +34,7 @@ export function App() {
             <Route path="groups/new" element={<CreateGroup />} />
             <Route path="groups/:groupId" element={<GroupLayout />}>
               <Route index element={<Overview />} />
+              <Route path="itinerary" element={<Itinerary />} />
               <Route path="members" element={<Members />} />
               <Route path="stays" element={<Stays />} />
               <Route path="chat" element={<Chat />} />

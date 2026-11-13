@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
-import { NAV_ITEMS, PHOTO_CREDITS_PATH } from "../../constants/app";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
+import { Bell, CalendarDays, House, LogIn, RefreshCw, Search, SquarePlus, UserRound, Users } from "lucide-react";
+import { CITY_PHOTO_CREDITS, HERO_PHOTO, NAV_ITEMS, PHOTO_CREDITS_PATH } from "../../constants/app";
 import { ROUTES } from "../../config/routes";
 import { assetUrl } from "../../lib/format";
+import { useResource } from "../../hooks/useResource";
+import { groupService } from "../../services/groupService";
 import { travellerService } from "../../services/travellerService";
 import { useSession } from "../../store/session";
 import { useToasts } from "../../store/toast";
 import { IdentityModal } from "../IdentityModal";
-import { Avatar } from "../ui";
+
+const NAV_ICONS = {
+  [ROUTES.HOME]: House,
+  [ROUTES.DISCOVER]: Users,
+  [ROUTES.TRIPS]: CalendarDays,
+  [ROUTES.NEW_GROUP]: SquarePlus,
+};
 
 function useLoadProfile() {
   const { userId, profile, setProfile, signOut } = useSession();
@@ -16,8 +25,7 @@ function useLoadProfile() {
     if (profile?.id === userId) return;
     let active = true;
     const selectedId = userId;
-    const stillSelected = () =>
-      active && useSession.getState().userId === selectedId;
+    const stillSelected = () => active && useSession.getState().userId === selectedId;
     travellerService
       .me()
       .then((loadedProfile) => {
@@ -34,71 +42,114 @@ function useLoadProfile() {
   }, [userId, profile, setProfile, signOut]);
 }
 
+function useSearchShortcut() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const onKey = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        navigate(ROUTES.DISCOVER);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [navigate]);
+}
+
+function UserMenu({ profile, onSwitch }) {
+  const [open, setOpen] = useState(false);
+  if (!profile)
+    return (
+      <Link className="signup-btn" to={ROUTES.PROFILE}>
+        <LogIn size={18} /> Sign up
+      </Link>
+    );
+  return (
+    <div className="me" onMouseLeave={() => setOpen(false)}>
+      <button className="me-btn" aria-expanded={open} aria-label="Account menu" onClick={() => setOpen(!open)}>
+        {profile.name.charAt(0).toUpperCase()}
+      </button>
+      {open && (
+        <div className="me-menu">
+          <strong>{profile.name}</strong>
+          <small>{profile.homeCity}</small>
+          <Link to={ROUTES.PROFILE} onClick={() => setOpen(false)}>
+            <UserRound size={16} /> Your profile
+          </Link>
+          <button
+            onClick={() => {
+              setOpen(false);
+              onSwitch();
+            }}
+          >
+            <RefreshCw size={16} /> Switch traveller
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AppLayout() {
   useLoadProfile();
+  useSearchShortcut();
   const profile = useSession((state) => state.profile);
   const toasts = useToasts((state) => state.toasts);
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const groups = useResource(() => (profile ? groupService.mine() : Promise.resolve([])), `${profile?.id}:${location.pathname}`);
+  const pending = (groups.data ?? []).reduce((sum, group) => sum + (group.pendingRequestCount ?? 0), 0);
+  const intended = location.state?.from?.split("?")[0];
   const [switching, setSwitching] = useState(false);
 
   return (
     <>
-      <header className="site-header">
-        <div className="header-inner">
-          <button
-            className="brand"
-            onClick={() => navigate(ROUTES.HOME)}
-            aria-label="Travel Together home"
-          >
-            <span className="brand-symbol">b.</span>
-            <span>
-              Travel Together
-              <small>A little company. A bigger adventure.</small>
-            </span>
-          </button>
-          <button
-            className="profile-button"
-            aria-label={
-              profile ? `${profile.name}, view profile` : "Your profile"
-            }
-            onClick={() => navigate(ROUTES.PROFILE)}
-          >
-            <Avatar person={profile} />
-            <span>{profile?.name || "Your profile"}</span>
-          </button>
-          <button className="switch-button" onClick={() => setSwitching(true)}>
-            Switch traveller
-          </button>
+      <header className="topbar">
+        <div className="topbar-inner">
+          <Link to={ROUTES.HOME} className="logo">
+            <span className="logo-mark">b.</span>
+            <span className="logo-text">Travel Together</span>
+          </Link>
+          <nav className="topnav" aria-label="Main">
+            {NAV_ITEMS.map((item) => {
+              const Icon = NAV_ICONS[item.to];
+              return (
+                <NavLink key={item.to} to={item.to} end className={({ isActive }) => (isActive || intended === item.to ? "active" : "")}>
+                  <Icon size={21} />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
+          <div className="topbar-actions">
+            <Link to={ROUTES.DISCOVER} className="pill-btn" aria-label="Search groups">
+              <Search size={20} />
+              <kbd>⌘K</kbd>
+            </Link>
+            {profile && (
+              <Link to={ROUTES.TRIPS} className="round-btn" aria-label={`${pending} pending join requests`}>
+                <Bell size={20} />
+                {pending > 0 && <span className="ping" />}
+              </Link>
+            )}
+            <UserMenu profile={profile} onSwitch={() => setSwitching(true)} />
+          </div>
         </div>
       </header>
       {switching && <IdentityModal onClose={() => setSwitching(false)} />}
-      <nav className="main-nav" aria-label="Main navigation">
-        <div>
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.to}
-              className={pathname === item.to ? "active" : ""}
-              onClick={() => navigate(item.to)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </nav>
       <main key={profile?.id}>
         <Outlet />
       </main>
       <footer>
-        Travel Together{" "}
+        Travel Together · demo bookings, no payment{" "}
         <span>
-          Made for shared adventures.{" "}
-          <a
-            href={assetUrl(PHOTO_CREDITS_PATH)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Photo credits
+          <a href={assetUrl(PHOTO_CREDITS_PATH)} target="_blank" rel="noreferrer">
+            Hotel photo credits
+          </a>
+          <a href={HERO_PHOTO.CREDITS} target="_blank" rel="noreferrer">
+            Hero photo credit
+          </a>
+          <a href={CITY_PHOTO_CREDITS} target="_blank" rel="noreferrer">
+            City photo credits
           </a>
         </span>
       </footer>

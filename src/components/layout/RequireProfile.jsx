@@ -7,6 +7,6 @@ export function RequireProfile() {
   const { profile, ready } = useSession();
   const location = useLocation();
   if (!ready) return <Loading label="Loading your profile…" />;
-  if (!profile) return <Navigate to={ROUTES.PROFILE} state={{ from: location.pathname }} replace />;
+  if (!profile) return <Navigate to={ROUTES.PROFILE} state={{ from: location.pathname + location.search }} replace />;
   return <Outlet />;
 }

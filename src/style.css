@@ -130,88 +130,14 @@ small {
   gap: 10px;
   align-items: center;
 }
-.site-header {
-  background: var(--navy);
-  color: white;
-}
-.header-inner {
-  max-width: 1240px;
-  margin: auto;
-  min-height: 94px;
-  padding: 16px 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-.brand {
-  background: none;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  text-align: left;
-  gap: 13px;
-  letter-spacing: -0.5px;
-  font-size: 22px;
-}
-.brand small {
-  color: #d0e0ff;
-  letter-spacing: 0;
-  font-size: 10px;
-  font-weight: 400;
-  margin-top: 2px;
-}
-.brand-symbol {
-  font-weight: 800;
-  font-size: 35px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #7da9e0;
-  border-radius: 12px;
-  width: 49px;
-  height: 49px;
-}
-.profile-button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: #fff1;
-  border: 1px solid #ffffff45;
-  font-size: 13px;
-}
-.main-nav {
-  background: white;
-  border-bottom: 1px solid var(--line);
-}
-.main-nav > div {
-  max-width: 1240px;
-  margin: auto;
-  display: flex;
-  gap: 18px;
-  padding: 0 28px;
-}
-.main-nav button {
-  background: none;
-  color: #596579;
-  border: 0;
-  border-radius: 0;
-  min-height: 60px;
-  font-size: 14px;
-  padding: 16px 8px;
-  border-bottom: 3px solid transparent;
-}
-.main-nav button.active {
-  color: var(--blue);
-  border-bottom-color: var(--blue);
-}
 main {
-  max-width: 1240px;
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
   margin: auto;
-  padding: 40px 28px 70px;
+  padding: 40px var(--gutter) 70px;
   min-height: calc(100vh - 245px);
 }
 footer {
-  max-width: 1184px;
+  width: min(var(--page-max), 100% - 2 * var(--gutter));
   margin: auto;
   border-top: 1px solid var(--line);
   padding: 24px 0;
@@ -219,128 +145,6 @@ footer {
   justify-content: space-between;
   font-size: 12px;
   color: var(--muted);
-}
-.hero {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 60px;
-  align-items: center;
-  padding: 24px 0 50px;
-}
-.hero h1 {
-  font-size: clamp(38px, 4.6vw, 64px);
-}
-.hero h1 span {
-  color: var(--blue);
-}
-.hero p {
-  max-width: 490px;
-  font-size: 17px;
-  color: var(--muted);
-  line-height: 1.8;
-}
-.hero .actions {
-  margin-top: 25px;
-}
-.hero-foot {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 25px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.travel-art {
-  height: 385px;
-  overflow: hidden;
-  position: relative;
-  border-radius: 20px;
-  background: #d5eafa;
-  isolation: isolate;
-}
-.art-sun {
-  position: absolute;
-  width: 105px;
-  height: 105px;
-  right: 60px;
-  top: 35px;
-  border-radius: 50%;
-  background: #ffcf66;
-}
-.art-mountain {
-  position: absolute;
-  width: 390px;
-  height: 340px;
-  left: 105px;
-  top: 135px;
-  transform: rotate(42deg);
-  border-radius: 40px;
-  background: #7da8a0;
-}
-.art-mountain.back {
-  left: -190px;
-  top: 120px;
-  background: #adc9c0;
-}
-.art-path {
-  position: absolute;
-  width: 160px;
-  height: 350px;
-  bottom: -170px;
-  left: 120px;
-  background: #f4e8cd;
-  transform: rotate(-25deg);
-  border-radius: 60%;
-}
-.art-label {
-  position: absolute;
-  top: 28px;
-  left: 24px;
-  color: #16435b;
-  font-size: 12px;
-}
-.art-ticket {
-  position: absolute;
-  bottom: 25px;
-  left: 25px;
-  right: 25px;
-  padding: 22px;
-  background: #fffffff2;
-  border: 1px solid white;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px #001d4910;
-  display: grid;
-  gap: 8px;
-}
-.art-ticket span {
-  font-size: 10px;
-  letter-spacing: 1.7px;
-  color: var(--navy);
-}
-.art-ticket strong {
-  font-size: 25px;
-  letter-spacing: -0.6px;
-}
-.intro-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  border-top: 1px solid var(--line);
-  padding-top: 30px;
-}
-.intro-grid article {
-  padding: 12px;
-}
-.intro-grid article > span {
-  font-size: 12px;
-  color: var(--blue);
-  display: block;
-  margin-bottom: 14px;
-}
-.intro-grid p {
-  font-size: 14px;
-  color: var(--muted);
-  max-width: 280px;
 }
 .page-heading {
   margin-bottom: 30px;
@@ -970,12 +774,6 @@ dialog::backdrop {
   }
 }
 @media (max-width: 1000px) {
-  .hero {
-    gap: 30px;
-  }
-  .travel-art {
-    height: 340px;
-  }
   .discovery-layout {
     grid-template-columns: 300px minmax(0, 1fr);
     gap: 22px;
@@ -994,79 +792,8 @@ dialog::backdrop {
   }
 }
 @media (max-width: 760px) {
-  .header-inner {
-    padding: 14px 18px;
-    min-height: 80px;
-  }
-  .brand {
-    font-size: 18px;
-  }
-  .brand small {
-    display: none;
-  }
-  .brand-symbol {
-    height: 40px;
-    width: 40px;
-    font-size: 28px;
-  }
-  .profile-button {
-    padding: 6px;
-  }
-  .profile-button > span:last-child {
-    display: none;
-  }
-  .main-nav > div {
-    padding: 0 14px;
-    gap: 12px;
-  }
-  .main-nav button {
-    font-size: 12px;
-    min-height: 52px;
-  }
   main {
     padding: 27px 18px 45px;
-  }
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding-top: 15px;
-  }
-  .hero h1 {
-    font-size: 43px;
-  }
-  .hero p {
-    font-size: 16px;
-  }
-  .travel-art {
-    height: 270px;
-  }
-  .art-ticket {
-    padding: 17px;
-  }
-  .art-ticket strong {
-    font-size: 22px;
-  }
-  .hero-foot {
-    gap: 11px;
-  }
-  .intro-grid {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-  .intro-grid article {
-    padding: 12px 0;
-  }
-  .intro-grid article > span {
-    float: left;
-    margin-right: 16px;
-    margin-top: 5px;
-  }
-  .intro-grid h3,
-  .intro-grid p {
-    margin-left: 33px;
-  }
-  .intro-grid p {
-    max-width: none;
   }
   .form-layout,
   .discovery-layout,
@@ -1177,20 +904,8 @@ dialog::backdrop {
   .discovery-layout .form-grid {
     grid-template-columns: 1fr;
   }
-  .hero h1 {
-    font-size: 37px;
-  }
-  .hero .actions button {
-    width: 100%;
-  }
   .member-grid {
     grid-template-columns: 1fr;
-  }
-  .main-nav > div {
-    gap: 6px;
-  }
-  .main-nav button {
-    font-size: 11px;
   }
   .price-row {
     gap: 10px;
@@ -1217,19 +932,6 @@ h1,
 h2,
 h3 {
   overflow-wrap: anywhere;
-}
-.profile-button > span:last-child {
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.switch-button {
-  background: transparent;
-  border: 1px solid #ffffff55;
-  color: white;
-  font-size: 12px;
-  padding: 9px 12px;
 }
 .hotel-filters {
   display: flex;
@@ -1276,18 +978,6 @@ h3 {
   margin-top: 20px;
 }
 @media (max-width: 760px) {
-  .switch-button {
-    font-size: 10px;
-    padding: 7px;
-    min-height: 38px;
-    max-width: 66px;
-  }
-  .header-inner {
-    gap: 8px;
-  }
-  .site-header .brand small {
-    display: none;
-  }
   .hotel-filters {
     padding: 16px;
   }
@@ -1305,23 +995,6 @@ h3 {
   --navy: #003b95;
   --line: #e1e7ef;
 }
-.site-header {
-  background: #003b95;
-}
-.brand-symbol {
-  background: #ffffff12;
-  border-radius: 13px 13px 13px 3px;
-}
-.brand {
-  letter-spacing: -0.8px;
-}
-.main-nav button {
-  font-weight: 600;
-}
-.main-nav button.active {
-  background: #edf5ff;
-  border-radius: 8px 8px 0 0;
-}
 .panel {
   border-color: #e2e7ef;
   box-shadow: 0 5px 22px #0b315205;
@@ -1329,87 +1002,6 @@ h3 {
 .eyebrow {
   color: #56718f;
   letter-spacing: 2px;
-}
-.hero {
-  gap: 65px;
-  padding-top: 34px;
-  padding-bottom: 65px;
-}
-.hero h1 {
-  letter-spacing: -2.8px;
-  font-weight: 750;
-}
-.hero p {
-  font-size: 18px;
-  max-width: 465px;
-  line-height: 1.75;
-}
-.hero .actions button {
-  padding: 15px 23px;
-  border-radius: 10px;
-}
-.travel-art {
-  height: 420px;
-  background: #dfebef;
-  border-radius: 110px 20px 20px 20px;
-  border: 8px solid white;
-  box-shadow: 0 12px 40px #1236570c;
-}
-.art-sun {
-  background: #ffc85c;
-  height: 120px;
-  width: 120px;
-  top: 45px;
-  right: 40px;
-}
-.art-label {
-  top: 33px;
-  left: 50px;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-}
-.art-mountain {
-  background: #54877e;
-  top: 160px;
-}
-.art-mountain.back {
-  background: #9ab9ad;
-}
-.art-ticket {
-  background: #fffdf7;
-  border: 0;
-  left: 22px;
-  right: 22px;
-  bottom: 22px;
-  padding: 24px;
-  box-shadow: 0 5px 20px #08275212;
-}
-.art-ticket strong {
-  font-size: 28px;
-  color: #082752;
-}
-.intro-grid {
-  gap: 28px;
-  padding-top: 28px;
-}
-.intro-grid article {
-  padding: 16px 20px;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-.intro-grid article > span {
-  background: #fff1bd;
-  color: #6c5200;
-  border-radius: 8px;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-}
-.intro-grid h3 {
-  font-size: 17px;
 }
 .page-heading {
   margin: 8px 0 32px;
@@ -1675,73 +1267,11 @@ footer a {
   .group-cover h2 {
     font-size: 28px;
   }
-  .hero {
-    gap: 30px;
-  }
-  .hero h1 {
-    font-size: 48px;
-  }
   .hotel-card {
     grid-template-columns: 28% 1fr;
   }
 }
 @media (max-width: 760px) {
-  .brand small {
-    display: none;
-  }
-  .header-inner {
-    gap: 9px;
-  }
-  .brand {
-    font-size: 17px;
-  }
-  .brand-symbol {
-    height: 33px;
-    width: 33px;
-    font-size: 24px;
-  }
-  .hero {
-    padding-top: 10px;
-    padding-bottom: 35px;
-    gap: 25px;
-  }
-  .hero h1 {
-    font-size: 42px;
-    letter-spacing: -1.8px;
-  }
-  .hero p {
-    font-size: 16px;
-  }
-  .hero .actions button {
-    padding: 12px 18px;
-  }
-  .travel-art {
-    height: 290px;
-    border-radius: 65px 15px 15px 15px;
-  }
-  .art-label {
-    left: 30px;
-    top: 22px;
-  }
-  .art-ticket {
-    padding: 18px;
-  }
-  .art-ticket strong {
-    font-size: 23px;
-  }
-  .intro-grid {
-    gap: 12px;
-  }
-  .intro-grid article {
-    padding: 18px;
-  }
-  .intro-grid article > span {
-    float: left;
-  }
-  .intro-grid h3,
-  .intro-grid p {
-    margin-left: 43px;
-  }
   .page-heading h1 {
     font-size: 34px;
   }
@@ -1829,27 +1359,11 @@ footer a {
   }
 }
 @media (max-width: 400px) {
-  .hero h1 {
-    font-size: 37px;
-  }
-  .main-nav > div {
-    justify-content: space-between;
-  }
-  .profile-button {
-    min-height: 38px;
-  }
-  .brand {
-    gap: 7px;
-  }
   .card-footer {
     gap: 9px;
   }
   .group-cover h2 {
     font-size: 29px;
-  }
-  .hero-foot {
-    gap: 9px;
-    font-size: 10px;
   }
 }
 

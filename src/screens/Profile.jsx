@@ -1,118 +1,117 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
-import { LIMITS } from "../constants/app";
+import { Link, useLocation, useNavigate } from "react-router";
+import { ArrowLeft, ArrowRight, Check, MapPin, Plus, Search, Users, UserRound } from "lucide-react";
+import { BUDGET_SLIDER, HERO_PHOTO, LIMITS, SIGN_UP_REASONS } from "../constants/app";
+import { FALLBACK_ICON, GENDER_GLYPHS, INTEREST_ICONS } from "../constants/icons";
 import { ROUTES } from "../config/routes";
-import { labelOf } from "../lib/format";
+import { formatMoney, labelOf } from "../lib/format";
 import { useMeta } from "../hooks/useMeta";
 import { travellerService } from "../services/travellerService";
 import { useSession } from "../store/session";
 import { toast } from "../store/toast";
-import { Chips, Field, Notice, RemoteState, Select } from "../components/ui";
+import { Stepper } from "../components/Stepper";
+import { Swoosh } from "../components/Swoosh";
+import { Dropdown } from "../components/Dropdown";
+import { Notice, RemoteState } from "../components/ui";
 
-const EMPTY_PROFILE = {
-  name: "",
-  homeCity: "",
-  age: "",
-  gender: "",
-  genderPreference: "",
-  interests: [],
-};
+const STEPS = [
+  { label: "Profile", note: "Set up your traveller profile to find the right travel buddies." },
+  { label: "Interests", note: "Pick your travel interests to find like-minded travellers." },
+  { label: "Preferences", note: "Set your travel preferences for better matches." },
+];
+
+const EMPTY_PROFILE = { name: "", homeCity: "", age: "", gender: "", genderPreference: "", interests: [], budget: "" };
 
 export function Profile() {
   const meta = useMeta();
   const profile = useSession((state) => state.profile);
+  const [step, setStep] = useState(0);
   return (
-    <section className="form-layout">
-      <aside>
-        <span className="eyebrow">LET’S GET TO KNOW YOU</span>
-        <h1>
-          Great company
-          <br />
-          starts with you.
-        </h1>
-        <p className="lede">
-          A few details help you find people who travel your way.
+    <div className="wizard">
+      <aside className="wizard-photo" style={{ backgroundImage: `url("${HERO_PHOTO.SRC}")` }}>
+        <p className="handwritten">
+          {profile ? "Your profile travels with you." : STEPS[step].note}
+          <Swoosh className="white" />
         </p>
-        <div className="aside-note">
-          Your profile stays saved, so you can come back to your plans anytime.
-        </div>
       </aside>
-      <div className="panel">
-        <h2>Your travel profile</h2>
-        <p className="muted">
-          Tell your future travel companions a little about yourself.
-        </p>
+      <section className="wizard-main">
         <RemoteState resource={meta} />
-        {meta.data &&
-          (profile ? (
-            <SavedProfile meta={meta.data} profile={profile} />
-          ) : (
-            <SignUpForm meta={meta.data} />
-          ))}
-      </div>
-    </section>
+        {meta.data && (profile ? <SavedProfile meta={meta.data} profile={profile} /> : <SignUpWizard meta={meta.data} step={step} setStep={setStep} />)}
+      </section>
+    </div>
   );
 }
 
 function SavedProfile({ meta, profile }) {
-  const navigate = useNavigate();
-  const interestLabel = (id) =>
-    meta.interests.find((interest) => interest.id === id)?.label ?? id;
+  const interestLabel = (id) => meta.interests.find((interest) => interest.id === id)?.label ?? id;
   return (
     <>
-      <Notice>
-        Your profile is saved. Use Switch traveller to create or choose another
-        profile.
-      </Notice>
-      <div className="form-grid">
-        <Field label="Your name">
-          <input disabled value={profile.name} />
-        </Field>
-        <Field label="Home city">
-          <input disabled value={profile.homeCity} />
-        </Field>
-        <Field label="Gender">
-          <input disabled value={labelOf("gender", profile.gender)} />
-        </Field>
-        <Field label="Travel group gender preference">
-          <input
-            disabled
-            value={labelOf("genderPreference", profile.genderPreference)}
-          />
-        </Field>
-      </div>
-      <div className="chips">
-        {profile.interests.map((id) => (
-          <span key={id} className="chip selected">
-            {interestLabel(id)}
+      <h1 className="wizard-title">
+        Hi, <span className="accent">{profile.name.split(" ")[0]}<Swoosh className="orange" /></span>
+      </h1>
+      <p className="wizard-sub">Your profile is saved. Use Switch traveller in the menu to change who you are.</p>
+      <div className="field-row">
+        <div className="field-card">
+          <span className="field-label">Home city</span>
+          <span className="field-value">
+            <MapPin size={18} /> {profile.homeCity}
           </span>
-        ))}
+        </div>
+        <div className="field-card">
+          <span className="field-label">Gender</span>
+          <span className="field-value">{labelOf("gender", profile.gender)}</span>
+        </div>
+        <div className="field-card">
+          <span className="field-label">Travels with</span>
+          <span className="field-value">{labelOf("genderPreference", profile.genderPreference)}</span>
+        </div>
       </div>
-      <button className="full" onClick={() => navigate(ROUTES.START)}>
-        Continue with this profile →
-      </button>
+      <div className="tile-chips">
+        {profile.interests.map((id) => {
+          const Icon = INTEREST_ICONS[id] ?? FALLBACK_ICON;
+          return (
+            <span key={id} className="tile-chip">
+              <Icon size={16} /> {interestLabel(id)}
+            </span>
+          );
+        })}
+      </div>
+      <div className="wizard-actions">
+        <Link className="ghost-btn" to={ROUTES.NEW_GROUP}>
+          <Plus size={18} /> Create a trip
+        </Link>
+        <Link className="next-btn" to={ROUTES.DISCOVER}>
+          <Search size={18} /> Find a group
+        </Link>
+      </div>
     </>
   );
 }
 
-function SignUpForm({ meta }) {
+function SignUpWizard({ meta, step, setStep }) {
   const signIn = useSession((state) => state.signIn);
+  const setBudget = useSession((state) => state.setBudget);
   const navigate = useNavigate();
-  const from = useLocation().state?.from ?? ROUTES.START;
+  const from = useLocation().state?.from;
+  const reason = from && (SIGN_UP_REASONS[from.split("?")[0]] ?? "continue");
   const [form, setForm] = useState(EMPTY_PROFILE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const change = (key) => (event) =>
-    setForm({ ...form, [key]: event.target.value });
+  const minInterests = meta.matchRules.MIN_SHARED_INTERESTS;
+  const change = (key) => (event) => setForm({ ...form, [key]: event.target.value });
+  const toggleInterest = (id) =>
+    setForm({ ...form, interests: form.interests.includes(id) ? form.interests.filter((value) => value !== id) : [...form.interests, id] });
 
   async function submit(event) {
     event.preventDefault();
-    setBusy(true);
     setError("");
+    if (step === 0 && !form.gender) return setError("Choose your gender.");
+    if (step === 1 && form.interests.length < minInterests) return setError(`Pick at least ${minInterests} interests.`);
+    if (step === 2 && !form.genderPreference) return setError("Choose who you want to travel with.");
+    if (step < STEPS.length - 1) return setStep(step + 1);
+    setBusy(true);
     try {
-      const home = meta.homeCities.find(
-        (city) => city.city === form.homeCity.trim(),
-      );
+      const home = meta.homeCities.find((city) => city.city === form.homeCity.trim());
       const profile = await travellerService.signUp({
         name: form.name.trim(),
         homeCity: form.homeCity.trim(),
@@ -123,8 +122,9 @@ function SignUpForm({ meta }) {
         interests: form.interests,
       });
       signIn(profile);
+      setBudget(form.budget);
       toast(`Welcome, ${profile.name}!`);
-      navigate(from, { replace: true });
+      navigate(from ?? ROUTES.START, { replace: true });
     } catch (failure) {
       setError(failure.message);
       setBusy(false);
@@ -133,79 +133,218 @@ function SignUpForm({ meta }) {
 
   return (
     <form onSubmit={submit}>
-      <div className="form-grid">
-        <Field label="Your name">
-          <input
-            required
-            maxLength={LIMITS.NAME}
-            autoComplete="name"
-            value={form.name}
-            onChange={change("name")}
-          />
-        </Field>
-        <Field label="Home city">
-          <input
-            required
-            maxLength={LIMITS.HOME_CITY}
-            list="home-cities"
-            value={form.homeCity}
-            onChange={change("homeCity")}
-          />
-          <datalist id="home-cities">
-            {meta.homeCityOptions.map((home) => (
-              <option key={home.id} value={home.id}>
-                {home.label}
-              </option>
-            ))}
-          </datalist>
-        </Field>
-        <Field label="Age (optional)">
-          <input
-            type="number"
-            min={LIMITS.MIN_AGE}
-            max={LIMITS.MAX_AGE}
-            step="1"
-            value={form.age}
-            onChange={change("age")}
-          />
-        </Field>
-        <Field label="Gender">
-          <Select
-            required
-            options={meta.genderOptions}
-            value={form.gender}
-            onChange={change("gender")}
-          />
-        </Field>
-      </div>
-      <Field
-        label="Travel group gender preference"
-        hint="Same gender only means female-only for women and male-only for men."
-      >
-        <Select
-          required
-          options={meta.genderPreferenceOptions}
-          value={form.genderPreference}
-          onChange={change("genderPreference")}
-        />
-      </Field>
-      <fieldset>
-        <legend>Your interests</legend>
-        <p className="muted">
-          Choose your interests. Sharing at least{" "}
-          {meta.matchRules.MIN_SHARED_INTERESTS} interests with a creator is
-          needed to match.
-        </p>
-        <Chips
-          options={meta.interests}
-          selected={form.interests}
-          onChange={(interests) => setForm({ ...form, interests })}
-        />
-      </fieldset>
+      <Stepper steps={STEPS.map((item) => item.label)} current={step} />
+      {reason && step === 0 && <Notice>Create your profile to {reason}. You’ll go straight there after.</Notice>}
+
+      {step === 0 && (
+        <>
+          <h1 className="wizard-title">
+            Tell us about{" "}
+            <span className="accent">
+              yourself
+              <Swoosh className="orange" />
+            </span>
+          </h1>
+          <p className="wizard-sub">This helps us match you with the right travel groups.</p>
+          <div className="field-row">
+            <label className="field-card grow">
+              <span className="field-label">
+                Full name <i>*</i>
+              </span>
+              <input required autoFocus maxLength={LIMITS.NAME} autoComplete="name" placeholder="e.g. Priya Shah" value={form.name} onChange={change("name")} />
+            </label>
+            <div className="field-card">
+              <span className="field-label">
+                Gender <i>*</i>
+              </span>
+              <div className="pill-options">
+                {meta.genderOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={form.gender === option.id ? "selected" : ""}
+                    aria-pressed={form.gender === option.id}
+                    onClick={() => setForm({ ...form, gender: option.id })}
+                  >
+                    <span className="glyph">{GENDER_GLYPHS[option.id] ?? <UserRound size={16} />}</span> {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="field-row">
+            <label className="field-card grow">
+              <span className="field-label">
+                Home city <i>*</i>
+              </span>
+              <span className="input-with-icon">
+                <MapPin size={20} />
+                <Dropdown
+                  freeText
+                  required
+                  maxLength={LIMITS.HOME_CITY}
+                  options={meta.homeCityOptions}
+                  placeholder="e.g. Mumbai"
+                  value={form.homeCity}
+                  onChange={change("homeCity")}
+                />
+              </span>
+            </label>
+            <label className="field-card narrow-card">
+              <span className="field-label">
+                Age <small>(optional)</small>
+              </span>
+              <input type="number" min={LIMITS.MIN_AGE} max={LIMITS.MAX_AGE} placeholder="22" value={form.age} onChange={change("age")} />
+            </label>
+          </div>
+        </>
+      )}
+
+      {step === 1 && (
+        <>
+          <h1 className="wizard-title">
+            What do you{" "}
+            <span className="accent">
+              love
+              <Swoosh className="orange" />
+            </span>{" "}
+            while travelling?
+          </h1>
+          <p className="wizard-sub">Select at least {minInterests} interests. This helps us match you with the right groups.</p>
+          <div className="interest-grid">
+            {meta.interests.map((interest) => {
+              const Icon = INTEREST_ICONS[interest.id] ?? FALLBACK_ICON;
+              const selected = form.interests.includes(interest.id);
+              return (
+                <button
+                  key={interest.id}
+                  type="button"
+                  className={`interest-tile ${selected ? "selected" : ""}`}
+                  aria-pressed={selected}
+                  onClick={() => toggleInterest(interest.id)}
+                >
+                  {selected && (
+                    <span className="tick">
+                      <Check size={14} strokeWidth={3} />
+                    </span>
+                  )}
+                  <Icon size={30} strokeWidth={1.6} />
+                  <span>{interest.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {step === 2 && (
+        <>
+          <h1 className="wizard-title">
+            Your travel{" "}
+            <span className="accent">
+              preferences
+              <Swoosh className="orange" />
+            </span>
+          </h1>
+          <p className="wizard-sub">Help us find groups that match your budget and comfort.</p>
+          <div className="field-row">
+            <div className="field-card">
+              <span className="field-label">
+                Travel budget <small>(per person)</small>
+              </span>
+              <div className="budget-input">
+                <span className="input-with-icon">
+                  ₹
+                  <input
+                    type="number"
+                    min={BUDGET_SLIDER.MIN}
+                    step={BUDGET_SLIDER.STEP}
+                    placeholder="60000"
+                    value={form.budget}
+                    onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                  />
+                </span>
+                {form.budget && <span className="budget-badge">Up to {formatMoney(Number(form.budget))}</span>}
+              </div>
+              <input
+                type="range"
+                className="range"
+                aria-label="Budget slider"
+                min={BUDGET_SLIDER.MIN}
+                max={BUDGET_SLIDER.MAX}
+                step={BUDGET_SLIDER.STEP}
+                value={form.budget || BUDGET_SLIDER.MIN}
+                onChange={(e) => setForm({ ...form, budget: e.target.value })}
+              />
+              <small className="field-hint">Used as your default when you search. Groups within {meta.matchRules.MAX_BUDGET_DIFF_PERCENT}% match.</small>
+            </div>
+            <div className="field-card">
+              <span className="field-label">
+                Gender preference <small>(for group)</small> <i>*</i>
+              </span>
+              <div className="pill-options">
+                {meta.genderPreferenceOptions.map((option) => {
+                  const same = option.id === "SAME_GENDER";
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={form.genderPreference === option.id ? "selected" : ""}
+                      aria-pressed={form.genderPreference === option.id}
+                      onClick={() => setForm({ ...form, genderPreference: option.id })}
+                    >
+                      {same ? <span className="glyph">{GENDER_GLYPHS[form.gender]}</span> : <Users size={18} />}
+                      {same ? `${labelOf("gender", form.gender)} only` : "Any"}
+                    </button>
+                  );
+                })}
+              </div>
+              <small className="field-hint">Groups match only when your preference and the creator’s both allow it.</small>
+            </div>
+          </div>
+          <div className="field-card review-card">
+            <span className="field-label">Your profile at a glance</span>
+            <div className="review-line">
+              <strong>{form.name}</strong>
+              <span>
+                <MapPin size={16} /> {form.homeCity}
+              </span>
+              <span>{labelOf("gender", form.gender)}</span>
+              {form.age && <span>{form.age} years</span>}
+            </div>
+            <div className="tile-chips">
+              {form.interests.map((id) => {
+                const Icon = INTEREST_ICONS[id] ?? FALLBACK_ICON;
+                return (
+                  <span key={id} className="tile-chip">
+                    <Icon size={16} /> {meta.interests.find((interest) => interest.id === id)?.label ?? id}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+
       <Notice error>{error}</Notice>
-      <button className="full" disabled={busy || form.interests.length === 0}>
-        {busy ? "Saving profile…" : "Save & continue →"}
-      </button>
+      <div className="wizard-actions">
+        {step > 0 ? (
+          <button type="button" className="ghost-btn" onClick={() => setStep(step - 1)}>
+            <ArrowLeft size={18} /> Back
+          </button>
+        ) : (
+          <span />
+        )}
+        {step === 1 && (
+          <span className="selected-count">
+            <b>{form.interests.length}</b> interests selected
+          </span>
+        )}
+        <button className="next-btn" disabled={busy}>
+          {busy ? "Saving…" : step < STEPS.length - 1 ? "Next" : "Complete setup"}
+          {step < STEPS.length - 1 ? <ArrowRight size={18} /> : <Check size={18} />}
+        </button>
+      </div>
     </form>
   );
 }

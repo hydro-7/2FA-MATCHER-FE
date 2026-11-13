@@ -1,3 +1,4 @@
+import { Dropdown } from "./Dropdown";
 import { useEffect, useRef } from "react";
 import { formatMoney } from "../lib/format";
 
@@ -57,17 +58,8 @@ export function Field({ label, hint, children }) {
   );
 }
 
-export function Select({ options = [], placeholder = "Choose an option", ...props }) {
-  return (
-    <select {...props}>
-      <option value="">{placeholder}</option>
-      {options.map((option) => (
-        <option key={option.id} value={option.id}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  );
+export function Select(props) {
+  return <Dropdown {...props} />;
 }
 
 export function Chips({ options = [], selected = [], onChange }) {

@@ -1,61 +1,150 @@
-import { useNavigate } from "react-router";
+import { useState } from "react";
+import { createSearchParams, Link, useNavigate } from "react-router";
+import { BedDouble, CalendarDays, MapPin, PenSquare, Plus, Search, Users, Wallet } from "lucide-react";
+import { HERO_PHOTO } from "../constants/app";
 import { ROUTES } from "../config/routes";
+import { formatDates } from "../lib/format";
+import { useMeta } from "../hooks/useMeta";
 import { useSession } from "../store/session";
+import { Swoosh } from "../components/Swoosh";
+import { Dropdown } from "../components/Dropdown";
 
 const STEPS = [
-  { title: "Find your kind of trip", text: "Explore groups that fit your dates, budget and interests." },
-  { title: "Make a connection", text: "Send a request. Your trip creator welcomes you aboard." },
-  { title: "Plan the stay together", text: "Compare hotels and see exactly what each person pays." },
+  { icon: PenSquare, tone: "blue", title: "Share your plan", text: "Tell us where, when and what you love." },
+  { icon: Users, tone: "purple", title: "Find your people", text: "Get matched with travellers who share your vibe." },
+  { icon: BedDouble, tone: "green", title: "Plan & book together", text: "Choose stays, split costs and manage your trip in one place." },
 ];
 
-export function Home() {
+function SearchBar({ meta }) {
   const navigate = useNavigate();
+  const savedBudget = useSession((state) => state.budget);
+  const [form, setForm] = useState({ city: "", checkIn: "", checkOut: "", budget: savedBudget });
+  const change = (key) => (event) => setForm({ ...form, [key]: event.target.value });
+  const { FIRST_CHECK_IN, LAST_CHECK_OUT } = meta.dateWindow;
+
+  function submit(event) {
+    event.preventDefault();
+    const params = Object.fromEntries(Object.entries(form).filter(([, value]) => value));
+    navigate({ pathname: ROUTES.DISCOVER, search: `?${createSearchParams(params)}` });
+  }
+
   return (
-    <>
-      <section className="hero">
-        <div>
-          <span className="eyebrow">GOOD TRIPS START WITH GOOD COMPANY</span>
+    <form className="search-bar" onSubmit={submit}>
+      <label className="search-field">
+        <span className="field-icon">
+          <MapPin size={20} />
+        </span>
+        <span className="field-body">
+          <small>Where to?</small>
+          <Dropdown required options={meta.cityOptions} placeholder="Choose a city" value={form.city} onChange={change("city")} />
+        </span>
+      </label>
+      <div className="search-field">
+        <span className="field-icon">
+          <CalendarDays size={20} />
+        </span>
+        <span className="field-body">
+          <small>Travel dates</small>
+          <span className="date-range">
+            <input required type="date" aria-label="Check-in" min={FIRST_CHECK_IN} max={LAST_CHECK_OUT} value={form.checkIn} onChange={change("checkIn")} />
+            <span>–</span>
+            <input
+              required
+              type="date"
+              aria-label="Check-out"
+              min={form.checkIn || FIRST_CHECK_IN}
+              max={LAST_CHECK_OUT}
+              value={form.checkOut}
+              onChange={change("checkOut")}
+            />
+          </span>
+        </span>
+      </div>
+      <label className="search-field">
+        <span className="field-icon">
+          <Wallet size={20} />
+        </span>
+        <span className="field-body">
+          <small>Budget (per person)</small>
+          <span className="budget">
+            ₹<input type="number" min="1" placeholder="60,000" value={form.budget} onChange={change("budget")} />
+          </span>
+        </span>
+      </label>
+      <button className="find-btn">
+        <Search size={20} /> Find Groups
+      </button>
+    </form>
+  );
+}
+
+export function Home() {
+  const meta = useMeta();
+  const data = meta.data;
+  return (
+    <div className="landing">
+      <section className="landing-hero">
+        <div className="hero-copy">
+          <span className="hero-chip">
+            <Users size={20} /> Group Travel Matcher
+          </span>
           <h1>
-            Your next adventure.
-            <br />
-            <span>Your kind of people.</span>
+            Turn solo plans into a <br />
+            <span className="accent">
+              shared adventure.
+              <Swoosh className="blue" />
+            </span>
           </h1>
-          <p>Meet travellers who share your interests, plan a trip together, and make room for new stories.</p>
-          <div className="actions">
-            <button onClick={() => navigate(ROUTES.DISCOVER)}>Find my travel people ↗</button>
-            <button className="secondary" onClick={() => navigate(ROUTES.NEW_GROUP)}>
-              Create a group
-            </button>
-          </div>
-          <div className="hero-foot">
-            <span>✓ Shared interests</span>
-            <span>✓ Clear costs</span>
-            <span>✓ You choose your group</span>
+          <p>Find like-minded travellers, plan together, split costs, book stays and create better travel stories.</p>
+          <div className="hero-ctas">
+            <Link to={ROUTES.DISCOVER} className="cta cta-primary">
+              <Users size={20} /> Find a Group
+            </Link>
+            <Link to={ROUTES.NEW_GROUP} className="cta cta-ghost">
+              <Plus size={20} /> Create a Trip
+            </Link>
           </div>
         </div>
-        <div className="travel-art" aria-hidden="true">
-          <div className="art-sun" />
-          <div className="art-mountain back" />
-          <div className="art-mountain" />
-          <div className="art-path" />
-          <span className="art-label">More than a destination.</span>
-          <div className="art-ticket">
-            <span>THE BEST PART OF THE TRIP?</span>
-            <strong>The people you meet.</strong>
-            <span>✦ &nbsp; TRAVEL TOGETHER &nbsp; ✦</span>
-          </div>
+        <div className="hero-photo" style={{ backgroundImage: `url("${HERO_PHOTO.SRC}")` }}>
+          {data && (
+            <div className="photo-chip">
+              <span>
+                <MapPin size={18} /> {data.cities.map((city) => city.name).join(" · ")}
+              </span>
+              <span>
+                <CalendarDays size={18} /> {formatDates(data.dateWindow.FIRST_CHECK_IN, data.dateWindow.LAST_CHECK_OUT)}
+              </span>
+            </div>
+          )}
+        </div>
+        {data && <SearchBar meta={data} />}
+      </section>
+
+      <section className="journey">
+        <h2>
+          Start your journey in{" "}
+          <span className="accent">
+            {STEPS.length} simple steps
+            <Swoosh className="orange" />
+          </span>
+        </h2>
+        <div className="journey-steps">
+          {STEPS.map((step, index) => (
+            <article key={step.title} className="journey-card">
+              <span className={`journey-icon ${step.tone}`}>
+                <step.icon size={30} />
+              </span>
+              <div>
+                <h3>
+                  {index + 1}. {step.title}
+                </h3>
+                <p>{step.text}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
-      <section className="intro-grid">
-        {STEPS.map((step, index) => (
-          <article key={step.title}>
-            <span>0{index + 1}</span>
-            <h3>{step.title}</h3>
-            <p>{step.text}</p>
-          </article>
-        ))}
-      </section>
-    </>
+    </div>
   );
 }
 
