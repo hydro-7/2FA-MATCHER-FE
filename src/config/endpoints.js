@@ -3,6 +3,12 @@ const id = encodeURIComponent;
 export const API_ENDPOINTS = {
   META: "/meta",
   ME: "/me",
+  FRIENDS: "/friends",
+  FRIEND_RELATIONSHIP: (travellerId) => `/friends/relationship/${id(travellerId)}`,
+  FRIEND_REQUESTS: "/friends/requests",
+  FRIEND_ACCEPT: (requestId) => `/friends/requests/${id(requestId)}/accept`,
+  FRIEND_REQUEST: (requestId) => `/friends/requests/${id(requestId)}`,
+  FRIEND: (travellerId) => `/friends/${id(travellerId)}`,
 
   TRAVELLERS: "/travellers",
   TRAVELLER: (travellerId) => `/travellers/${id(travellerId)}`,

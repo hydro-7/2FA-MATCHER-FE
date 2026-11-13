@@ -86,7 +86,6 @@ export const GROUP_TABS = [
   { path: "itinerary", label: "Itinerary" },
   { path: "members", label: "Members" },
   { path: "stays", label: "Hotels", membersOnly: true },
-  { path: "chat", label: "Chat", membersOnly: true },
   { path: "requests", label: "Requests", ownerOnly: true },
 ];
 

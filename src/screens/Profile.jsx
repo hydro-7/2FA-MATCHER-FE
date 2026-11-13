@@ -76,6 +76,9 @@ function SavedProfile({ meta, profile }) {
         })}
       </div>
       <div className="wizard-actions">
+        <Link className="ghost-btn" to={ROUTES.FRIENDS}>
+          <Users size={18} /> My friends
+        </Link>
         <Link className="ghost-btn" to={ROUTES.NEW_GROUP}>
           <Plus size={18} /> Create a trip
         </Link>

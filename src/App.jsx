@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { AppLayout } from "./components/layout/AppLayout";
 import { RequireProfile } from "./components/layout/RequireProfile";
 import { Empty, Loading } from "./components/ui";
@@ -9,12 +9,12 @@ import { CreateGroup } from "./screens/CreateGroup";
 import { Discover } from "./screens/Discover";
 import { MyTrips } from "./screens/MyTrips";
 import { MemberProfile } from "./screens/MemberProfile";
+import { Friends } from "./screens/Friends";
 import { GroupLayout } from "./screens/group/GroupLayout";
 import { Overview } from "./screens/group/Overview";
 import { Itinerary } from "./screens/group/Itinerary";
 import { Members } from "./screens/group/Members";
 import { Stays } from "./screens/group/Stays";
-import { Chat } from "./screens/group/Chat";
 import { Requests } from "./screens/group/Requests";
 
 // Leaflet is large, so the map tab loads on demand.
@@ -35,6 +35,7 @@ export function App() {
             <Route path="start" element={<Start />} />
             <Route path="discover" element={<Discover />} />
             <Route path="trips" element={<MyTrips />} />
+            <Route path="friends" element={<Friends />} />
             <Route path="groups/new" element={<CreateGroup />} />
             <Route path="groups/:groupId" element={<GroupLayout />}>
               <Route index element={<Overview />} />
@@ -49,7 +50,7 @@ export function App() {
               <Route path="itinerary" element={<Itinerary />} />
               <Route path="members" element={<Members />} />
               <Route path="stays" element={<Stays />} />
-              <Route path="chat" element={<Chat />} />
+              <Route path="chat" element={<Navigate to="../?chat=open" replace />} />
               <Route path="requests" element={<Requests />} />
             </Route>
             <Route path="travellers/:travellerId" element={<MemberProfile />} />

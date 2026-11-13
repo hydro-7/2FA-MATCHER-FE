@@ -101,7 +101,7 @@ export function Money({ value }) {
   return <>{formatMoney(value)}</>;
 }
 
-export function Modal({ title, onClose, children }) {
+export function Modal({ title, onClose, children, className }) {
   const dialog = useRef(null);
   useEffect(() => {
     const element = dialog.current;
@@ -111,6 +111,7 @@ export function Modal({ title, onClose, children }) {
   return (
     <dialog
       ref={dialog}
+      className={className}
       aria-labelledby="dialog-title"
       onCancel={(event) => {
         event.preventDefault();

@@ -8,6 +8,7 @@ import "./wizard.css";
 import "./dropdown.css";
 import "./discover.css";
 import "./group.css";
+import "./friends.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -3,6 +3,7 @@ const id = encodeURIComponent;
 export const ROUTES = {
   HOME: "/",
   PROFILE: "/profile",
+  FRIENDS: "/friends",
   START: "/start",
   DISCOVER: "/discover",
   TRIPS: "/trips",

@@ -77,6 +77,9 @@ function UserMenu({ profile, onSwitch }) {
           <Link to={ROUTES.PROFILE} onClick={() => setOpen(false)}>
             <UserRound size={16} /> Your profile
           </Link>
+          <Link to={ROUTES.FRIENDS} onClick={() => setOpen(false)}>
+            <Users size={16} /> Friends
+          </Link>
           <button
             onClick={() => {
               setOpen(false);

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router";
-import { MessageCircle, Send } from "lucide-react";
+import { useSearchParams } from "react-router";
+import { Maximize2, MessageCircle, Minimize2, Send, X } from "lucide-react";
 import { CHAT_POLL_MS, LIMITS } from "../../constants/app";
 import { formatTime } from "../../lib/format";
 import { messageService } from "../../services/messageService";
@@ -18,9 +18,85 @@ const mergeById = (current, incoming) => {
   );
 };
 
-export function Chat() {
-  const { group, isMember } = useOutletContext();
+export function ChatPopup({ group }) {
+  const [params, setParams] = useSearchParams();
+  const [open, setOpen] = useState(params.get("chat") === "open");
+  const [expanded, setExpanded] = useState(false);
+  const launcher = useRef(null);
+  const popup = useRef(null);
+
+  useEffect(() => {
+    if (params.get("chat") === "open") setOpen(true);
+  }, [params]);
+
+  function close() {
+    setOpen(false);
+    setExpanded(false);
+    if (params.has("chat")) {
+      const next = new URLSearchParams(params);
+      next.delete("chat");
+      setParams(next, { replace: true });
+    }
+    launcher.current?.focus();
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    const escape = (event) => {
+      if (document.querySelector("dialog[open]")) return;
+      if (event.key === "Escape") {
+        if (expanded) setExpanded(false);
+        else close();
+      }
+      if (expanded && event.key === "Tab") {
+        const controls = popup.current?.querySelectorAll('button:not(:disabled), input:not(:disabled)');
+        if (!controls?.length) return;
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
+  }, [open, params, expanded]);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [expanded]);
+
+  return (
+    <aside className={`chat-widget${expanded ? " is-expanded" : ""}`}>
+      {open && (
+        <div ref={popup} id="group-chat-popup" className="chat-popup" role="dialog" aria-modal={expanded || undefined} aria-label={`Group chat: ${group.name}`}>
+          <Chat group={group} onClose={close} expanded={expanded} onExpand={() => setExpanded((value) => !value)} />
+        </div>
+      )}
+      <button
+        ref={launcher}
+        className="chat-launcher"
+        aria-expanded={open}
+        aria-controls={open ? "group-chat-popup" : undefined}
+        onClick={() => open ? close() : setOpen(true)}
+      >
+        {open ? <X size={20} /> : <MessageCircle size={21} />}
+        {open ? "Close chat" : "Group chat"}
+      </button>
+    </aside>
+  );
+}
+
+function Chat({ group, onClose, expanded, onExpand }) {
   const userId = useSession((state) => state.userId);
+  const isMember = group.members.some((member) => member.id === userId);
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -83,8 +159,12 @@ export function Chat() {
         <span className="chat-header-icon"><MessageCircle size={23} /></span>
         <div>
           <h2>Group chat</h2>
-          <p>Share ideas and plan your trip together.</p>
+          <p>{group.name}</p>
         </div>
+        <button type="button" className="chat-close" aria-label={expanded ? "Reduce chat size" : "Expand chat"} title={expanded ? "Reduce chat size" : "Expand chat"} onClick={onExpand}>
+          {expanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+        </button>
+        <button type="button" className="chat-close" aria-label="Close group chat" onClick={onClose}><X size={20} /></button>
       </header>
       <div className="chat-log">
         {loading && (
@@ -119,6 +199,7 @@ export function Chat() {
           maxLength={LIMITS.MESSAGE}
           placeholder="Write a message"
           aria-label="Write a message"
+          autoFocus
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
         />

@@ -13,6 +13,7 @@ import { useSearch } from "../../store/search";
 import { useSession } from "../../store/session";
 import { toast } from "../../store/toast";
 import { Avatar, Notice, RemoteState } from "../../components/ui";
+import { ChatPopup } from "./Chat";
 
 export function GroupLayout() {
   const { groupId } = useParams();
@@ -98,6 +99,7 @@ export function GroupLayout() {
         </header>
         {tabNav}
         {outlet}
+        <ChatPopup key={`${group.id}-${userId}`} group={group} />
       </div>
     );
 
