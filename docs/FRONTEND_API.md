@@ -6,7 +6,7 @@ The UI now targets the teammate's Group Travel Matcher API v1, backed by Neon. S
 
 Standalone frontend checkout: `npm ci`, then `npm run dev`. In the original combined workspace: `npm run dev -w client`.
 
-The Vite proxy forwards `/api` to `VITE_BACKEND_ORIGIN`. Copy `.env.example` to `.env` and update the origin if cloudflared gives a new URL; restart Vite. Default origin is the supplied `https://paperbacks-nuts-automation-provincial.trycloudflare.com`. Optional `VITE_API_URL` can point directly to an API base; requests omit cookies because the server permits CORS with `*` and uses `X-User-Id`. There are no database passwords in this frontend.
+The Vite proxy forwards `/api` to `VITE_BACKEND_ORIGIN`. Copy `.env.example` to `.env` and update the origin if cloudflared gives a new URL; restart Vite. Default origin is `https://prepared-promoting-affordable-cables.trycloudflare.com`. Optional `VITE_API_URL` can point directly to an API base; requests omit cookies because the server permits CORS with `*` and uses `X-User-Id`. There are no database passwords in this frontend.
 
 ## Actual contract
 
@@ -45,11 +45,11 @@ All success responses wrap data as `{success:true,message,data}`. DELETE saved m
 - Hotel quotes, room counts and availability come from the backend. The UI merges shared saved options, shows savedBy/alignment, supports price/rating/star sorting and pagination, and disables unavailable saved options.
 - Saving a hotel is the backend's preference action; there is no invented separate preference endpoint.
 - Booking IDs, totals, split and member snapshots come from the booking API; dates come from group context. Locked bookings replace editing controls. A timeout/conflict is reconciled through GET booking before any retry, to avoid duplicate booking attempts.
-- Shared-interest refinement filters the server's already-compatible matches. The backend has no gender-composition search parameter, so that optional filter is hidden in live mode. Another traveller's group list is not exposed by the contract; member profile displays that limitation without inventing membership data.
+- Shared-interest and gender-composition refinement use the backend's `filters.sharedInterests` and `filters.genderMix` fields. Member profiles display real group summaries supplied by the updated traveller-profile endpoint. No membership or compatibility results are invented locally.
 - Requests have timeouts and reject stale results after identity changes. No fake sample fallback is used on a tunnel error.
 
 ## Preview and verification
 
 `?preview=1` remains an isolated, labelled design preview with temporary illustrative data. It is not evidence of a live API test. Live and fixture-based checks must be reported separately.
 
-The API contract agent tested signup, creation, match/search, joining, approval, hotel quotes, save/remove/alignment, finalize, persistent booked state, duplicate-finalize409, locked-save409 and nonmember403 using only new QA records. A temporary Cloudflare1033 outage interrupted the subsequent live browser pass. The final integration status and remaining live checks must be updated after a working tunnel is restored.
+Live two-browser acceptance passed against the restored tunnel: signup, creation, ranked matching, actual right-swipe request, approval, member profiles, hotel quote rendering, two saved options, comparison, removal, finalization, persisted locked booking after refresh, and mobile layout. Independent agents passed rejection, full-group exclusion/join rejection, multiple memberships, permissions, identity restore, G1 filters, G2 groups and screenshots. See `QA-STATUS.md` for evidence and test scope. The new chat endpoint is S1/stretch and is not part of the MVP UI or acceptance claim.

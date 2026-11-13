@@ -1,7 +1,7 @@
 // Live backend contract adapter. Screens use the small, consistent UI shapes below.
 export const backendOrigin =
   import.meta.env.VITE_BACKEND_ORIGIN ||
-  "https://paperbacks-nuts-automation-provincial.trycloudflare.com";
+  "https://prepared-promoting-affordable-cables.trycloudflare.com";
 const baseUrl = import.meta.env.VITE_API_URL || "/api";
 export const isPreview =
   new URLSearchParams(location.search).get("preview") === "1";
@@ -177,7 +177,11 @@ export const api = {
         id,
         label: id === "ANY" ? "Any gender" : "Same gender only",
       })),
-      genderCompositions: [],
+      genderCompositions: [
+        { id: "ALL_FEMALE", label: "Female only" },
+        { id: "ALL_MALE", label: "Male only" },
+        { id: "MIXED", label: "Mixed group" },
+      ],
       constraints: {
         minDate: raw.dateWindow.FIRST_CHECK_IN,
         maxDate: raw.dateWindow.LAST_CHECK_OUT,
@@ -227,17 +231,22 @@ export const api = {
   },
   async member(id) {
     if (isPreview) return preview(`/travellers/${id}`);
-    const traveller = await person(id);
+    const traveller = await request(`/travellers/${encodeURIComponent(id)}`);
+    people.set(id, traveller);
     const meta = metaCache || (await request("/meta"));
-    // /groups/mine is tied to the selected identity; it cannot list someone else's groups.
-    const groups = id === getUserId() ? (await api.myGroups()).groups : null;
+    const groups = Array.isArray(traveller.groups) ? traveller.groups : null;
     return {
       traveller: {
         ...traveller,
         interestLabels: traveller.interests.map(
           (id) => meta.interests.find((item) => item.id === id)?.label || id,
         ),
-        groups,
+        groups:
+          groups?.map((group) => ({
+            ...group,
+            destinationName: group.city,
+            capacity: group.maxSize,
+          })) || null,
       },
     };
   },
@@ -277,6 +286,10 @@ export const api = {
   async searchGroups(form) {
     if (isPreview) return preview("/groups/search", "POST", form);
     const identity = getUserId();
+    const filters = {};
+    if (form.sharedInterestIds?.length)
+      filters.sharedInterests = form.sharedInterestIds;
+    if (form.genderComposition) filters.genderMix = form.genderComposition;
     const raw = await request("/matches/search", "POST", {
       city: form.destinationId,
       checkIn: form.checkIn,
@@ -284,6 +297,7 @@ export const api = {
       budgetInr: Number(form.budget),
       interests: form.interests,
       genderPreference: form.genderPreference,
+      ...(Object.keys(filters).length ? { filters } : {}),
     });
     const searches = JSON.parse(
       sessionStorage.getItem(searchKey(identity)) || "{}",
@@ -301,11 +315,8 @@ export const api = {
         "The selected traveller changed. Search again with the current profile.",
       );
     sessionStorage.setItem(searchKey(identity), JSON.stringify(searches));
-    const interestIds = form.sharedInterestIds || [];
     return {
-      groups: groups.filter((group) =>
-        interestIds.every((id) => group.sharedInterests?.includes(id)),
-      ),
+      groups,
       nearMisses: raw.nearMisses || [],
       searchId: raw.searchId,
     };
@@ -391,6 +402,9 @@ export const api = {
       );
       return {
         ...option,
+        outsideCurrentResults: !raw.options.some(
+          (item) => item.roomId === option.roomId,
+        ),
         id: option.roomId,
         location: [raw.city, option.area].filter(Boolean).join(" · "),
         imageUrl: option.image

@@ -134,7 +134,7 @@
         "tags": [
           "Travellers"
         ],
-        "summary": "Traveller profile",
+        "summary": "Traveller profile page (G2): interests, home city, age, and the groups they are in (id, name, city, checkIn, checkOut, status, role OWNER|MEMBER, memberCount, maxSize), sorted by check-in then group id",
         "parameters": [
           {
             "name": "id",
@@ -148,7 +148,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Traveller"
+            "description": "Traveller profile with groups"
           },
           "404": {
             "description": "Not found"
@@ -673,12 +673,138 @@
         }
       }
     },
+    "/api/groups/{id}/messages": {
+      "get": {
+        "tags": [
+          "Group Page"
+        ],
+        "summary": "Group chat messages, oldest first, with author (S1)",
+        "security": [
+          {
+            "userId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "G-01"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Only messages created after this ISO timestamp (polling). Without it, the latest `limit` messages."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "description": "Max messages"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages with id, groupId, body, createdAt and author { id, name }"
+          },
+          "400": {
+            "description": "Invalid query"
+          },
+          "401": {
+            "description": "Missing or unknown X-User-Id"
+          },
+          "403": {
+            "description": "Caller is not a group member"
+          },
+          "404": {
+            "description": "Group not found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Group Page"
+        ],
+        "summary": "Post a chat message (any member, also after booking)",
+        "security": [
+          {
+            "userId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "G-01"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "additionalProperties": false
+              },
+              "example": {
+                "body": "Shall we pick the ryokan?"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created message"
+          },
+          "400": {
+            "description": "Body empty or over 1000 characters"
+          },
+          "401": {
+            "description": "Missing or unknown X-User-Id"
+          },
+          "403": {
+            "description": "Caller is not a group member"
+          },
+          "404": {
+            "description": "Group not found"
+          }
+        }
+      }
+    },
     "/api/matches/search": {
       "post": {
         "tags": [
           "Matches"
         ],
-        "summary": "Search groups (M3/M4). Saves the search, returns ranked matches (all 6 rules pass) and near misses (exactly 1 rule fails, with a suggestion). Gender comes from the profile; genderPreference defaults to the profile.",
+        "summary": "Search groups (M3/M4). Saves the search, returns ranked matches (all 6 rules pass) and near misses (exactly 1 rule fails, with a suggestion). Gender comes from the profile; genderPreference defaults to the profile. Each result has genderComposition { female, male, mix }. Optional filters (G1) only narrow matches and nearMisses: sharedInterests (owner must share all of them with you), minSharedInterests, genderMix (ALL_FEMALE|ALL_MALE|MIXED).",
         "security": [
           {
             "userId": []
@@ -724,6 +850,32 @@
                       "ANY",
                       "SAME_GENDER"
                     ]
+                  },
+                  "filters": {
+                    "type": "object",
+                    "properties": {
+                      "sharedInterests": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "maxItems": 16
+                      },
+                      "minSharedInterests": {
+                        "type": "integer",
+                        "minimum": 2,
+                        "maximum": 16
+                      },
+                      "genderMix": {
+                        "type": "string",
+                        "enum": [
+                          "ALL_FEMALE",
+                          "ALL_MALE",
+                          "MIXED"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
                   }
                 },
                 "required": [
@@ -746,14 +898,20 @@
                   "STREET_FOOD",
                   "ADVENTURE"
                 ],
-                "genderPreference": "SAME_GENDER"
+                "genderPreference": "SAME_GENDER",
+                "filters": {
+                  "sharedInterests": [
+                    "TEMPLES"
+                  ],
+                  "genderMix": "ALL_FEMALE"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "searchId, criteria, matches and nearMisses sorted by score desc, shared nights desc, check-in asc, group id asc"
+            "description": "searchId, criteria, filters (echo or null), totalBeforeFilters { matches, nearMisses }, matches and nearMisses sorted by score desc, shared nights desc, check-in asc, group id asc"
           },
           "400": {
             "description": "Validation failed, unknown interests, or city/dates outside the data (OUT_OF_DATA_RANGE)"

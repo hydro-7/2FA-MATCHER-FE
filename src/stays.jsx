@@ -222,6 +222,12 @@ export function Stays({ group, onChanged }) {
                         )}
                       </div>
                       <p>{option.roomDescription}</p>
+                      {option.outsideCurrentResults && (
+                        <Notice>
+                          Previously saved · outside the current results. Kept
+                          here so your group can still review its shortlist.
+                        </Notice>
+                      )}
                       {option.available === false && (
                         <Notice>
                           This saved option is no longer available for the full

@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target:
             env.VITE_BACKEND_ORIGIN ||
-            "https://paperbacks-nuts-automation-provincial.trycloudflare.com",
+            "https://prepared-promoting-affordable-cables.trycloudflare.com",
           changeOrigin: true,
           secure: true,
         },

@@ -1248,6 +1248,26 @@ dialog::backdrop {
 }
 
 /* Visual refinement: shared surfaces, readable hierarchy, generous touch targets. */
+.group-list > .request-row {
+  padding: 22px;
+}
+.request-row > div {
+  min-width: 0;
+}
+.request-row > button {
+  flex-shrink: 0;
+}
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}
+.profile-button > span:last-child {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .switch-button {
   background: transparent;
   border: 1px solid #ffffff55;

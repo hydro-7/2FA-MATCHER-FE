@@ -1059,7 +1059,22 @@ export function MemberProfile({ id, onOpen }) {
           <h2>Groups they’re part of</h2>
           <div className="group-list">
             {member.groups?.map((group) => (
-              <GroupCard key={group.id} group={group} onOpen={onOpen} />
+              <article key={group.id} className="panel request-row">
+                <div>
+                  <h3>{group.name}</h3>
+                  <p className="muted">
+                    {group.destinationName} ·{" "}
+                    {dates(group.checkIn, group.checkOut)}
+                  </p>
+                  <span className="badge">
+                    {group.memberCount} / {group.capacity} travellers ·{" "}
+                    {group.role === "OWNER" ? "Creator" : "Member"}
+                  </span>
+                </div>
+                <button className="secondary" onClick={() => onOpen(group.id)}>
+                  View group ↗
+                </button>
+              </article>
             ))}
           </div>
           {member.groups === null && (
