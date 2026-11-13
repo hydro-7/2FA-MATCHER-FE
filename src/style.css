@@ -1406,40 +1406,124 @@ footer a {
   background: #cc0000;
 }
 
+.group-chat {
+  padding: 0;
+  overflow: hidden;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chat-header-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  color: var(--brand);
+  background: #eaf1ff;
+}
+
+.chat-header h2 { margin: 0; }
+.chat-header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
 .chat-log {
   display: grid;
-  gap: 10px;
-  max-height: 420px;
-  min-height: 200px;
+  gap: 14px;
+  height: clamp(280px, 42vh, 440px);
+  padding: 24px;
+  background: #f6f8fc;
   overflow-y: auto;
   align-content: start;
-  margin-bottom: 12px;
+  overscroll-behavior: contain;
 }
 
 .chat-message {
   max-width: 75%;
-  padding: 8px 12px;
+  min-width: 120px;
+  justify-self: start;
+  padding: 12px 16px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 16px 16px 16px 4px;
   background: #fff;
+  box-shadow: 0 2px 4px rgb(11 19 37 / 3%);
 }
 
 .chat-message.mine {
   justify-self: end;
-  background: #eaf3ff;
+  background: var(--brand);
+  color: #fff;
+  border-color: transparent;
+  border-radius: 16px 16px 4px 16px;
 }
 
-.chat-message p {
-  margin: 2px 0 0;
+.chat-message small {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  font-size: 11px;
+  color: var(--muted);
 }
+
+.chat-message.mine small { color: rgb(255 255 255 / 85%); }
+.chat-message small strong { color: inherit; font-size: 12px; }
+.chat-message time { margin-left: auto; }
+
+.chat-message p {
+  margin: 6px 0 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.chat-empty {
+  justify-self: center;
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 12px;
+}
+.chat-empty strong { color: var(--ink); }
+.chat-empty p { margin: 0; font-size: 13px; }
 
 .chat-form {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
 }
 
 .chat-form input {
   flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f6f8fc;
+  color: var(--ink);
+  font: inherit;
+}
+
+.chat-form input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.chat-form button { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; border-radius: 14px; }
+
+@media (max-width: 600px) {
+  .chat-header, .chat-log, .chat-form { padding: 16px; }
+  .chat-message { max-width: 90%; }
+  .chat-form { gap: 8px; }
+  .chat-form button { padding-inline: 12px; }
 }
 
 /* Swipe discovery uses direct pointer feedback, with no animation dependency. */

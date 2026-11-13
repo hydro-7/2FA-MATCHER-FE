@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
+import { MessageCircle, Send } from "lucide-react";
 import { CHAT_POLL_MS, LIMITS } from "../../constants/app";
 import { formatTime } from "../../lib/format";
 import { messageService } from "../../services/messageService";
@@ -77,8 +78,14 @@ export function Chat() {
 
   if (!isMember) return <Empty title="Only group members can chat" />;
   return (
-    <section className="panel">
-      <h2>Group chat</h2>
+    <section className="panel group-chat">
+      <header className="chat-header">
+        <span className="chat-header-icon"><MessageCircle size={23} /></span>
+        <div>
+          <h2>Group chat</h2>
+          <p>Share ideas and plan your trip together.</p>
+        </div>
+      </header>
       <div className="chat-log">
         {loading && (
           <p role="status" className="muted">
@@ -86,9 +93,11 @@ export function Chat() {
           </p>
         )}
         {!loading && messages.length === 0 && (
-          <p className="muted">
-            No messages yet. Say hello and start planning.
-          </p>
+          <div className="chat-empty">
+            <MessageCircle size={30} />
+            <strong>Your next adventure starts with hello</strong>
+            <p>Send the first message to your travel group.</p>
+          </div>
         )}
         {messages.map((message) => (
           <div
@@ -96,7 +105,8 @@ export function Chat() {
             className={`chat-message ${message.author.id === userId ? "mine" : ""}`}
           >
             <small>
-              {message.author.name} · {formatTime(message.createdAt)}
+              <strong>{message.author.id === userId ? "You" : message.author.name}</strong>
+              <time dateTime={message.createdAt}>{formatTime(message.createdAt)}</time>
             </small>
             <p>{message.body}</p>
           </div>
@@ -108,10 +118,11 @@ export function Chat() {
           required
           maxLength={LIMITS.MESSAGE}
           placeholder="Write a message"
+          aria-label="Write a message"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
         />
-        <button disabled={busy || !draft.trim()}>Send</button>
+        <button disabled={busy || !draft.trim()}><Send size={18} /> {busy ? "Sending…" : "Send"}</button>
       </form>
     </section>
   );
