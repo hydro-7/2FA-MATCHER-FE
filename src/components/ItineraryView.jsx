@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Clock } from "lucide-react";
+import { formatClock } from "../lib/format";
 
 export function ItineraryView({ plan, compact = false }) {
   const [active, setActive] = useState(0);
@@ -22,7 +23,7 @@ export function ItineraryView({ plan, compact = false }) {
             {day.items.map((item, index) => (
               <li key={index}>
                 <Clock size={16} />
-                {item.time && <b>{item.time}</b>}
+                {item.time && <b>{formatClock(item.time)}</b>}
                 <span>{item.text}</span>
               </li>
             ))}

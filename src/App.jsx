@@ -1,7 +1,8 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { AppLayout } from "./components/layout/AppLayout";
 import { RequireProfile } from "./components/layout/RequireProfile";
-import { Empty } from "./components/ui";
+import { Empty, Loading } from "./components/ui";
 import { Home, Start } from "./screens/Home";
 import { Profile } from "./screens/Profile";
 import { CreateGroup } from "./screens/CreateGroup";
@@ -15,6 +16,9 @@ import { Members } from "./screens/group/Members";
 import { Stays } from "./screens/group/Stays";
 import { Chat } from "./screens/group/Chat";
 import { Requests } from "./screens/group/Requests";
+
+// Leaflet is large, so the map tab loads on demand.
+const TripMap = lazy(() => import("./screens/group/TripMap").then((module) => ({ default: module.TripMap })));
 
 function NotFound() {
   return <Empty title="Page not found">Use the menu above to get back on track.</Empty>;
@@ -34,6 +38,14 @@ export function App() {
             <Route path="groups/new" element={<CreateGroup />} />
             <Route path="groups/:groupId" element={<GroupLayout />}>
               <Route index element={<Overview />} />
+              <Route
+                path="map"
+                element={
+                  <Suspense fallback={<Loading label="Loading map…" />}>
+                    <TripMap />
+                  </Suspense>
+                }
+              />
               <Route path="itinerary" element={<Itinerary />} />
               <Route path="members" element={<Members />} />
               <Route path="stays" element={<Stays />} />

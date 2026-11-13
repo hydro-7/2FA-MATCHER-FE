@@ -764,3 +764,32 @@ main:has(> .trips-page) {
     scale: 1.4;
   }
 }
+
+@media (min-width: 1101px) {
+  .filter-card {
+    max-height: calc(100dvh - var(--header-h) - 40px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+.date-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.boxed.dates small {
+  width: 38px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.boxed.dates input {
+  font-size: 15px;
+}
+
+.boxed.dates input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+}

@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Hotel,
   LayoutGrid,
+  MapPinned,
   MessageSquare,
   Castle,
   FerrisWheel,
@@ -53,6 +54,6 @@ export const FALLBACK_ICON = Sparkles;
 export const GENDER_GLYPHS = { MALE: "♂", FEMALE: "♀" };
 
 // Group tab icons keyed by GROUP_TABS path.
-export const TAB_ICONS = { "": LayoutGrid, itinerary: MapIcon, members: Users, stays: Hotel, chat: MessageSquare, requests: ClipboardList };
+export const TAB_ICONS = { "": LayoutGrid, map: MapPinned, itinerary: MapIcon, members: Users, stays: Hotel, chat: MessageSquare, requests: ClipboardList };
 
 export const TRAVEL_STYLE_ICONS = { Budget: WalletCards, Comfort: Sofa, Explorer: Compass, Slow: Leaf };

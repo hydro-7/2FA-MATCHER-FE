@@ -2,7 +2,13 @@ import { ROUTES } from "../config/routes";
 
 export const STORAGE_KEYS = {
   SESSION: "travel-matcher-session",
+  GEOCODE: "travel-matcher-geocode",
+  DRAFTS: "travel-matcher-drafts",
+  SEARCH: "travel-matcher-search",
 };
+
+// Nominatim allows one request per second; stay just under it.
+export const GEOCODE = { SPACING_MS: 1100, VIEWBOX_DEG: 0.2, MIN_WORDS: 2 };
 
 export const REQUEST_TIMEOUT_MS = 30000;
 export const CHAT_POLL_MS = 4000;
@@ -51,6 +57,10 @@ export const DISCOVER_SORTS = [
   { id: "DATES", label: "Earliest dates" },
 ];
 
+export const EMPTY_PROFILE = { name: "", homeCity: "", age: "", gender: "", genderPreference: "", interests: [], budget: "" };
+
+export const EMPTY_TRIP = { name: "", city: "", checkIn: "", checkOut: "", maxSize: "", budgetInr: "", summary: "" };
+
 export const TRAVEL_STYLES = ["Budget", "Comfort", "Explorer", "Slow"];
 
 export const RULE_SUGGESTIONS = ["Respect each other", "Be on time", "Share expenses equally"];
@@ -71,6 +81,7 @@ export const HERO_PHOTO = {
 
 export const GROUP_TABS = [
   { path: "", label: "Overview", memberLabel: "Workspace" },
+  { path: "map", label: "Map", membersOnly: true },
   { path: "itinerary", label: "Itinerary" },
   { path: "members", label: "Members" },
   { path: "stays", label: "Hotels", membersOnly: true },

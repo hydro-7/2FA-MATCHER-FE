@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeft, ArrowRight, CalendarDays, Check, Layers, ListChecks, MapPin, Moon, PenLine, Plus, Rocket, Trash2, Users, Wallet, X } from "lucide-react";
-import { HERO_PHOTO, LIMITS, RULE_SUGGESTIONS, TRAVEL_STYLES } from "../constants/app";
+import { HERO_PHOTO, LIMITS, TRAVEL_STYLES } from "../constants/app";
 import { FALLBACK_ICON, GENDER_GLYPHS, INTEREST_ICONS, TRAVEL_STYLE_ICONS } from "../constants/icons";
 import { ROUTES } from "../config/routes";
 import { addDays, formatDates, formatDay, formatMoney, labelOf, nightsBetween } from "../lib/format";
 import { formatItinerary } from "../lib/itinerary";
 import { useMeta } from "../hooks/useMeta";
 import { groupService } from "../services/groupService";
+import { EMPTY_TRIP_DRAFT, useDrafts } from "../store/drafts";
 import { useSession } from "../store/session";
 import { toast } from "../store/toast";
 import { Dropdown } from "../components/Dropdown";
 import { Stepper } from "../components/Stepper";
+import { TimePicker } from "../components/TimePicker";
 import { Swoosh } from "../components/Swoosh";
 import { Notice, RemoteState } from "../components/ui";
 
@@ -21,7 +23,6 @@ const STEPS = [
   { label: "Preferences", note: "Set your preferences and publish your trip." },
 ];
 
-const EMPTY_TRIP = { name: "", city: "", checkIn: "", checkOut: "", maxSize: "", budgetInr: "", summary: "" };
 const EMPTY_ACTIVITY = { time: "", text: "" };
 
 function tripDays(trip) {
@@ -29,9 +30,19 @@ function tripDays(trip) {
   return Array.from({ length: nights }, (_, index) => addDays(trip.checkIn, index));
 }
 
+function useTripDraft() {
+  const userId = useSession((state) => state.userId);
+  const draft = useDrafts((state) => state.trips[userId]) ?? EMPTY_TRIP_DRAFT;
+  const setTripDraft = useDrafts((state) => state.setTripDraft);
+  const clearTripDraft = useDrafts((state) => state.clearTripDraft);
+  return { draft, hasDraft: draft !== EMPTY_TRIP_DRAFT, update: (patch) => setTripDraft(userId, patch), clear: () => clearTripDraft(userId) };
+}
+
 export function CreateGroup() {
   const meta = useMeta();
-  const [step, setStep] = useState(0);
+  const { draft, update } = useTripDraft();
+  const step = draft.step;
+  const setStep = (value) => update({ step: value });
   return (
     <div className="wizard">
       <aside className="wizard-photo" style={{ backgroundImage: `url("${HERO_PHOTO.SRC}")` }}>
@@ -51,11 +62,14 @@ export function CreateGroup() {
 function TripWizard({ meta, step, setStep }) {
   const profile = useSession((state) => state.profile);
   const navigate = useNavigate();
-  const [trip, setTrip] = useState(EMPTY_TRIP);
-  const [plan, setPlan] = useState([]);
-  const [activeDay, setActiveDay] = useState(0);
-  const [style, setStyle] = useState("");
-  const [rules, setRules] = useState(RULE_SUGGESTIONS);
+  const { draft, hasDraft, update, clear } = useTripDraft();
+  const { trip, plan, activeDay, style, rules } = draft;
+  const [restored] = useState(hasDraft);
+  const setTrip = (value) => update({ trip: value });
+  const setPlan = (value) => update({ plan: value });
+  const setActiveDay = (value) => update({ activeDay: value });
+  const setStyle = (value) => update({ style: value });
+  const setRules = (value) => update({ rules: value });
   const [ruleDraft, setRuleDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -112,6 +126,7 @@ function TripWizard({ meta, step, setStep }) {
         budgetInr: Number(trip.budgetInr),
         itinerary,
       });
+      clear();
       toast("Trip published. Join requests will show up on your group page.");
       navigate(ROUTES.GROUP(group.id));
     } catch (failure) {
@@ -123,6 +138,14 @@ function TripWizard({ meta, step, setStep }) {
   return (
     <form onSubmit={submit}>
       <Stepper steps={STEPS.map((item) => item.label)} current={step} />
+      {restored && hasDraft && (
+        <p className="draft-note">
+          Your unfinished trip is saved on this device.{" "}
+          <button type="button" className="link-btn" onClick={clear}>
+            Start over
+          </button>
+        </p>
+      )}
 
       {step === 0 && (
         <>
@@ -262,7 +285,7 @@ function TripWizard({ meta, step, setStep }) {
                 <ol className="timeline">
                   {day.activities.map((activity, index) => (
                     <li key={index}>
-                      <input type="time" aria-label="Time" value={activity.time} onChange={(e) => updateActivity(index, { time: e.target.value })} />
+                      <TimePicker value={activity.time} onChange={(time) => updateActivity(index, { time })} />
                       <input placeholder="What are you doing?" value={activity.text} onChange={(e) => updateActivity(index, { text: e.target.value })} />
                       <button
                         type="button"

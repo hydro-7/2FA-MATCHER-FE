@@ -7,6 +7,7 @@ import { ROUTES } from "../config/routes";
 import { formatMoney, labelOf } from "../lib/format";
 import { useMeta } from "../hooks/useMeta";
 import { travellerService } from "../services/travellerService";
+import { EMPTY_PROFILE_DRAFT, useDrafts } from "../store/drafts";
 import { useSession } from "../store/session";
 import { toast } from "../store/toast";
 import { Stepper } from "../components/Stepper";
@@ -20,12 +21,10 @@ const STEPS = [
   { label: "Preferences", note: "Set your travel preferences for better matches." },
 ];
 
-const EMPTY_PROFILE = { name: "", homeCity: "", age: "", gender: "", genderPreference: "", interests: [], budget: "" };
-
 export function Profile() {
   const meta = useMeta();
   const profile = useSession((state) => state.profile);
-  const [step, setStep] = useState(0);
+  const step = useDrafts((state) => state.profile?.step) ?? 0;
   return (
     <div className="wizard">
       <aside className="wizard-photo" style={{ backgroundImage: `url("${HERO_PHOTO.SRC}")` }}>
@@ -36,7 +35,7 @@ export function Profile() {
       </aside>
       <section className="wizard-main">
         <RemoteState resource={meta} />
-        {meta.data && (profile ? <SavedProfile meta={meta.data} profile={profile} /> : <SignUpWizard meta={meta.data} step={step} setStep={setStep} />)}
+        {meta.data && (profile ? <SavedProfile meta={meta.data} profile={profile} /> : <SignUpWizard meta={meta.data} />)}
       </section>
     </div>
   );
@@ -88,13 +87,18 @@ function SavedProfile({ meta, profile }) {
   );
 }
 
-function SignUpWizard({ meta, step, setStep }) {
+function SignUpWizard({ meta }) {
+  const draft = useDrafts((state) => state.profile) ?? EMPTY_PROFILE_DRAFT;
+  const setProfileDraft = useDrafts((state) => state.setProfileDraft);
+  const clearProfileDraft = useDrafts((state) => state.clearProfileDraft);
+  const { step, form } = draft;
+  const setStep = (value) => setProfileDraft({ step: value });
+  const setForm = (value) => setProfileDraft({ form: value });
   const signIn = useSession((state) => state.signIn);
   const setBudget = useSession((state) => state.setBudget);
   const navigate = useNavigate();
   const from = useLocation().state?.from;
   const reason = from && (SIGN_UP_REASONS[from.split("?")[0]] ?? "continue");
-  const [form, setForm] = useState(EMPTY_PROFILE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const minInterests = meta.matchRules.MIN_SHARED_INTERESTS;
@@ -121,6 +125,7 @@ function SignUpWizard({ meta, step, setStep }) {
         genderPreference: form.genderPreference,
         interests: form.interests,
       });
+      clearProfileDraft();
       signIn(profile);
       setBudget(form.budget);
       toast(`Welcome, ${profile.name}!`);

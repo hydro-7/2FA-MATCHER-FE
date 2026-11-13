@@ -2,6 +2,8 @@
   color-scheme: light;
   --page-max: 1680px;
   --gutter: clamp(16px, 4vw, 64px);
+  --header-h: 77px;
+  --footer-h: 64px;
   --brand: #0057ff;
   --brand-dark: #0046cc;
   --brand-soft: #eaf1ff;

@@ -30,6 +30,11 @@ export const addDays = (date, days) => new Date(Date.parse(`${date}T00:00:00Z`) 
 
 export const formatDay = (date) => new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 
+export function formatClock(value) {
+  const [hours, minutes] = value.split(":").map(Number);
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${hours >= 12 ? "PM" : "AM"}`;
+}
+
 export const formatTime = (iso) =>
   new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 

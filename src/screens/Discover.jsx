@@ -33,7 +33,15 @@ export function Discover() {
 }
 
 function initialFilters(meta, profile, params, saved) {
-  if (saved && !params.get("city")) return saved;
+  // The URL wins for what it carries; everything else comes from the saved search.
+  if (saved)
+    return {
+      ...saved,
+      city: params.get("city") ?? saved.city,
+      checkIn: params.get("checkIn") ?? saved.checkIn,
+      checkOut: params.get("checkOut") ?? saved.checkOut,
+      budgetInr: params.get("budget") ?? saved.budgetInr,
+    };
   return {
     homeCity: profile.homeCity,
     city: params.get("city") ?? "",
@@ -62,10 +70,12 @@ function DiscoverBody({ meta }) {
     initialFilters(meta, profile, params, search.travellerId === profile.id ? search.criteria : null),
   );
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState(DISCOVER_SORTS[0].id);
+  const sort = search.view.sort || DISCOVER_SORTS[0].id;
+  const setSort = (value) => search.setView({ sort: value });
   const [showAllInterests, setShowAllInterests] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [view, setView] = useState("list");
+  const view = search.view.mode;
+  const setView = (mode) => search.setView({ mode });
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState("");
   const latest = useRef(0);
@@ -164,18 +174,24 @@ function DiscoverBody({ meta }) {
             <span className="filter-label">
               Travel dates <small>(overlap)</small>
             </span>
-            <div className="boxed with-icon dates">
-              <CalendarDays size={18} />
-              <input type="date" aria-label="Check-in" min={FIRST_CHECK_IN} max={LAST_CHECK_OUT} value={filters.checkIn} onChange={(e) => set({ checkIn: e.target.value })} />
-              <span>–</span>
-              <input
-                type="date"
-                aria-label="Check-out"
-                min={filters.checkIn || FIRST_CHECK_IN}
-                max={LAST_CHECK_OUT}
-                value={filters.checkOut}
-                onChange={(e) => set({ checkOut: e.target.value })}
-              />
+            <div className="date-stack">
+              <label className="boxed with-icon dates">
+                <CalendarDays size={18} />
+                <small>From</small>
+                <input type="date" aria-label="Check-in" min={FIRST_CHECK_IN} max={LAST_CHECK_OUT} value={filters.checkIn} onChange={(e) => set({ checkIn: e.target.value })} />
+              </label>
+              <label className="boxed with-icon dates">
+                <CalendarDays size={18} />
+                <small>To</small>
+                <input
+                  type="date"
+                  aria-label="Check-out"
+                  min={filters.checkIn || FIRST_CHECK_IN}
+                  max={LAST_CHECK_OUT}
+                  value={filters.checkOut}
+                  onChange={(e) => set({ checkOut: e.target.value })}
+                />
+              </label>
             </div>
           </div>
 
@@ -259,9 +275,7 @@ function DiscoverBody({ meta }) {
               ) : (
                 matches.map((match) => <MatchCard key={match.groupId} match={match} searchId={result.searchId} interestLabel={interestLabel} />)
               )}
-              {result?.nearMisses.length > 0 && (
-                <NearMisses groups={result.nearMisses} filters={filters} onFix={set} />
-              )}
+              <NearMisses groups={result?.nearMisses ?? []} filters={filters} onFix={set} />
             </div>
           )}
         </section>
@@ -322,8 +336,10 @@ function MatchCard({ match, searchId, interestLabel }) {
   );
 }
 
-// One-tap fixes for rules the seeker controls; gender and group size can only be explained.
+// One-tap fixes for rules the seeker controls; near misses without one are hidden.
 function fixFor(rule, group, filters) {
+  if (rule === "GENDER" && filters.genderPreference === "SAME_GENDER")
+    return { label: "Open to any gender", patch: { genderPreference: "ANY" } };
   if (rule === "DATES_OVERLAP") return { label: "Use their dates", patch: { checkIn: group.checkIn, checkOut: group.checkOut } };
   if (rule === "BUDGET") return { label: `Set budget to ${formatMoney(group.budgetInr)}`, patch: { budgetInr: String(group.budgetInr) } };
   if (rule === "SHARED_INTERESTS" && group.interests)
@@ -332,6 +348,13 @@ function fixFor(rule, group, filters) {
 }
 
 function NearMisses({ groups, filters, onFix }) {
+  const fixable = groups.flatMap((group) =>
+    group.suggestions.flatMap((item) => {
+      const fix = fixFor(item.rule, group, filters);
+      return fix ? [{ group, item, fix, rule: group.rules.find((r) => r.id === item.rule) }] : [];
+    }),
+  );
+  if (!fixable.length) return null;
   return (
     <section className="near-miss">
       <header>
@@ -340,17 +363,13 @@ function NearMisses({ groups, filters, onFix }) {
         </span>
         <div>
           <h3>
-            {groups.length} more {groups.length === 1 ? "group is" : "groups are"} one change away
+            {fixable.length} more {fixable.length === 1 ? "group is" : "groups are"} one change away
           </h3>
           <p>Each of these fails just one rule. Fix it and they move into your matches.</p>
         </div>
       </header>
       <div className="near-grid">
-        {groups.map((group) =>
-          group.suggestions.map((item) => {
-            const rule = group.rules.find((r) => r.id === item.rule);
-            const fix = fixFor(item.rule, group, filters);
-            return (
+        {fixable.map(({ group, item, fix, rule }) => (
               <article key={`${group.groupId}-${item.rule}`} className="near-card">
                 <div className="near-photo" style={{ backgroundImage: `url("${CITY_PHOTOS[group.city] ?? HERO_PHOTO.SRC}")` }} />
                 <div className="near-body">
@@ -359,18 +378,14 @@ function NearMisses({ groups, filters, onFix }) {
                     {formatDates(group.checkIn, group.checkOut)} · {formatMoney(group.budgetInr)}
                   </small>
                   <span className="near-reason">
-                    <CircleAlert size={15} /> {rule?.label ?? item.rule}: {fix ? item.suggestion : (rule?.detail ?? item.suggestion)}
+                    <CircleAlert size={15} /> {rule?.label ?? item.rule}: {item.suggestion}
                   </span>
                 </div>
-                {fix && (
-                  <button type="button" className="fix-btn" onClick={() => onFix(fix.patch)}>
-                    <Wand2 size={16} /> {fix.label}
-                  </button>
-                )}
+                <button type="button" className="fix-btn" onClick={() => onFix(fix.patch)}>
+                  <Wand2 size={16} /> {fix.label}
+                </button>
               </article>
-            );
-          }),
-        )}
+        ))}
       </div>
     </section>
   );
