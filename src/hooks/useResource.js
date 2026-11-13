@@ -1,15 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useResource(load, key) {
   const [state, setState] = useState({ data: null, loading: true, error: "" });
   const [version, setVersion] = useState(0);
+  const previousKey = useRef(key);
 
   useEffect(() => {
     let active = true;
-    setState((current) => ({ ...current, loading: true, error: "" }));
+    const sameResource = previousKey.current === key;
+    previousKey.current = key;
+    setState((current) => ({
+      data: sameResource ? current.data : null,
+      loading: true,
+      error: "",
+    }));
     load()
       .then((data) => active && setState({ data, loading: false, error: "" }))
-      .catch((error) => active && setState({ data: null, loading: false, error: error.message }));
+      .catch(
+        (error) =>
+          active &&
+          setState({ data: null, loading: false, error: error.message }),
+      );
     return () => {
       active = false;
     };
@@ -17,5 +28,9 @@ export function useResource(load, key) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, version]);
 
-  return { ...state, reload: () => setVersion((value) => value + 1) };
+  return {
+    ...state,
+    data: previousKey.current === key ? state.data : null,
+    reload: () => setVersion((value) => value + 1),
+  };
 }

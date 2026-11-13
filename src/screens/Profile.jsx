@@ -9,7 +9,14 @@ import { useSession } from "../store/session";
 import { toast } from "../store/toast";
 import { Chips, Field, Notice, RemoteState, Select } from "../components/ui";
 
-const EMPTY_PROFILE = { name: "", homeCity: "", age: "", gender: "", genderPreference: "", interests: [] };
+const EMPTY_PROFILE = {
+  name: "",
+  homeCity: "",
+  age: "",
+  gender: "",
+  genderPreference: "",
+  interests: [],
+};
 
 export function Profile() {
   const meta = useMeta();
@@ -23,14 +30,25 @@ export function Profile() {
           <br />
           starts with you.
         </h1>
-        <p className="lede">A few details help you find people who travel your way.</p>
-        <div className="aside-note">Your profile stays saved, so you can come back to your plans anytime.</div>
+        <p className="lede">
+          A few details help you find people who travel your way.
+        </p>
+        <div className="aside-note">
+          Your profile stays saved, so you can come back to your plans anytime.
+        </div>
       </aside>
       <div className="panel">
         <h2>Your travel profile</h2>
-        <p className="muted">Tell your future travel companions a little about yourself.</p>
+        <p className="muted">
+          Tell your future travel companions a little about yourself.
+        </p>
         <RemoteState resource={meta} />
-        {meta.data && (profile ? <SavedProfile meta={meta.data} profile={profile} /> : <SignUpForm meta={meta.data} />)}
+        {meta.data &&
+          (profile ? (
+            <SavedProfile meta={meta.data} profile={profile} />
+          ) : (
+            <SignUpForm meta={meta.data} />
+          ))}
       </div>
     </section>
   );
@@ -38,10 +56,14 @@ export function Profile() {
 
 function SavedProfile({ meta, profile }) {
   const navigate = useNavigate();
-  const interestLabel = (id) => meta.interests.find((interest) => interest.id === id)?.label ?? id;
+  const interestLabel = (id) =>
+    meta.interests.find((interest) => interest.id === id)?.label ?? id;
   return (
     <>
-      <Notice>Your profile is saved. Use Switch traveller to create or choose another profile.</Notice>
+      <Notice>
+        Your profile is saved. Use Switch traveller to create or choose another
+        profile.
+      </Notice>
       <div className="form-grid">
         <Field label="Your name">
           <input disabled value={profile.name} />
@@ -53,7 +75,10 @@ function SavedProfile({ meta, profile }) {
           <input disabled value={labelOf("gender", profile.gender)} />
         </Field>
         <Field label="Travel group gender preference">
-          <input disabled value={labelOf("genderPreference", profile.genderPreference)} />
+          <input
+            disabled
+            value={labelOf("genderPreference", profile.genderPreference)}
+          />
         </Field>
       </div>
       <div className="chips">
@@ -77,14 +102,17 @@ function SignUpForm({ meta }) {
   const [form, setForm] = useState(EMPTY_PROFILE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const change = (key) => (event) => setForm({ ...form, [key]: event.target.value });
+  const change = (key) => (event) =>
+    setForm({ ...form, [key]: event.target.value });
 
   async function submit(event) {
     event.preventDefault();
     setBusy(true);
     setError("");
     try {
-      const home = meta.homeCities.find((city) => city.city === form.homeCity.trim());
+      const home = meta.homeCities.find(
+        (city) => city.city === form.homeCity.trim(),
+      );
       const profile = await travellerService.signUp({
         name: form.name.trim(),
         homeCity: form.homeCity.trim(),
@@ -107,10 +135,22 @@ function SignUpForm({ meta }) {
     <form onSubmit={submit}>
       <div className="form-grid">
         <Field label="Your name">
-          <input required maxLength={LIMITS.NAME} autoComplete="name" value={form.name} onChange={change("name")} />
+          <input
+            required
+            maxLength={LIMITS.NAME}
+            autoComplete="name"
+            value={form.name}
+            onChange={change("name")}
+          />
         </Field>
         <Field label="Home city">
-          <input required maxLength={LIMITS.HOME_CITY} list="home-cities" value={form.homeCity} onChange={change("homeCity")} />
+          <input
+            required
+            maxLength={LIMITS.HOME_CITY}
+            list="home-cities"
+            value={form.homeCity}
+            onChange={change("homeCity")}
+          />
           <datalist id="home-cities">
             {meta.homeCityOptions.map((home) => (
               <option key={home.id} value={home.id}>
@@ -120,22 +160,50 @@ function SignUpForm({ meta }) {
           </datalist>
         </Field>
         <Field label="Age (optional)">
-          <input type="number" min={LIMITS.MIN_AGE} max={LIMITS.MAX_AGE} step="1" value={form.age} onChange={change("age")} />
+          <input
+            type="number"
+            min={LIMITS.MIN_AGE}
+            max={LIMITS.MAX_AGE}
+            step="1"
+            value={form.age}
+            onChange={change("age")}
+          />
         </Field>
         <Field label="Gender">
-          <Select required options={meta.genderOptions} value={form.gender} onChange={change("gender")} />
+          <Select
+            required
+            options={meta.genderOptions}
+            value={form.gender}
+            onChange={change("gender")}
+          />
         </Field>
       </div>
-      <Field label="Travel group gender preference" hint="Same gender only means female-only for women and male-only for men.">
-        <Select required options={meta.genderPreferenceOptions} value={form.genderPreference} onChange={change("genderPreference")} />
+      <Field
+        label="Travel group gender preference"
+        hint="Same gender only means female-only for women and male-only for men."
+      >
+        <Select
+          required
+          options={meta.genderPreferenceOptions}
+          value={form.genderPreference}
+          onChange={change("genderPreference")}
+        />
       </Field>
       <fieldset>
         <legend>Your interests</legend>
-        <p className="muted">Choose at least {meta.matchRules.MIN_SHARED_INTERESTS} things you’d love to share on your trip.</p>
-        <Chips options={meta.interests} selected={form.interests} onChange={(interests) => setForm({ ...form, interests })} />
+        <p className="muted">
+          Choose your interests. Sharing at least{" "}
+          {meta.matchRules.MIN_SHARED_INTERESTS} interests with a creator is
+          needed to match.
+        </p>
+        <Chips
+          options={meta.interests}
+          selected={form.interests}
+          onChange={(interests) => setForm({ ...form, interests })}
+        />
       </fieldset>
       <Notice error>{error}</Notice>
-      <button className="full" disabled={busy || form.interests.length < meta.matchRules.MIN_SHARED_INTERESTS}>
+      <button className="full" disabled={busy || form.interests.length === 0}>
         {busy ? "Saving profile…" : "Save & continue →"}
       </button>
     </form>

@@ -13,11 +13,24 @@ function useLoadProfile() {
   const { userId, profile, setProfile, signOut } = useSession();
   useEffect(() => {
     if (!userId) return signOut();
-    if (profile) return;
+    if (profile?.id === userId) return;
+    let active = true;
+    const selectedId = userId;
+    const stillSelected = () =>
+      active && useSession.getState().userId === selectedId;
     travellerService
       .me()
-      .then(setProfile)
-      .catch((error) => (error.status === 401 ? signOut() : useSession.setState({ ready: true })));
+      .then((loadedProfile) => {
+        if (stillSelected()) setProfile(loadedProfile);
+      })
+      .catch((error) => {
+        if (!stillSelected()) return;
+        if (error.status === 401) signOut();
+        else useSession.setState({ ready: true });
+      });
+    return () => {
+      active = false;
+    };
   }, [userId, profile, setProfile, signOut]);
 }
 
@@ -33,14 +46,24 @@ export function AppLayout() {
     <>
       <header className="site-header">
         <div className="header-inner">
-          <button className="brand" onClick={() => navigate(ROUTES.HOME)} aria-label="Travel Together home">
+          <button
+            className="brand"
+            onClick={() => navigate(ROUTES.HOME)}
+            aria-label="Travel Together home"
+          >
             <span className="brand-symbol">b.</span>
             <span>
               Travel Together
               <small>A little company. A bigger adventure.</small>
             </span>
           </button>
-          <button className="profile-button" onClick={() => navigate(ROUTES.PROFILE)}>
+          <button
+            className="profile-button"
+            aria-label={
+              profile ? `${profile.name}, view profile` : "Your profile"
+            }
+            onClick={() => navigate(ROUTES.PROFILE)}
+          >
             <Avatar person={profile} />
             <span>{profile?.name || "Your profile"}</span>
           </button>
@@ -53,7 +76,11 @@ export function AppLayout() {
       <nav className="main-nav" aria-label="Main navigation">
         <div>
           {NAV_ITEMS.map((item) => (
-            <button key={item.to} className={pathname === item.to ? "active" : ""} onClick={() => navigate(item.to)}>
+            <button
+              key={item.to}
+              className={pathname === item.to ? "active" : ""}
+              onClick={() => navigate(item.to)}
+            >
               {item.label}
             </button>
           ))}
@@ -66,7 +93,11 @@ export function AppLayout() {
         Travel Together{" "}
         <span>
           Made for shared adventures.{" "}
-          <a href={assetUrl(PHOTO_CREDITS_PATH)} target="_blank" rel="noreferrer">
+          <a
+            href={assetUrl(PHOTO_CREDITS_PATH)}
+            target="_blank"
+            rel="noreferrer"
+          >
             Photo credits
           </a>
         </span>

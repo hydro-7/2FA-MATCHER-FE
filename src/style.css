@@ -1925,3 +1925,85 @@ footer a {
 .chat-form input {
   flex: 1;
 }
+
+/* Swipe discovery uses direct pointer feedback, with no animation dependency. */
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: white;
+}
+.segmented button {
+  background: white;
+  color: #596579;
+  min-height: 36px;
+  font-size: 13px;
+  padding: 7px 12px;
+}
+.segmented button.chosen {
+  background: #eaf3ff;
+  color: #003b95;
+}
+.swipe-area {
+  max-width: 680px;
+  margin: auto;
+  padding: 8px;
+  touch-action: pan-y;
+  overflow: clip;
+}
+.swipe-card {
+  position: relative;
+  user-select: none;
+  cursor: grab;
+}
+.swipe-card:active {
+  cursor: grabbing;
+}
+.swipe-card .group-card {
+  box-shadow: 0 10px 30px #12365712;
+}
+.swipe-actions {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+.swipe-actions button {
+  min-height: 50px;
+  border-radius: 30px;
+}
+.swipe-stamp {
+  position: absolute;
+  top: 30px;
+  left: 25px;
+  z-index: 3;
+  border: 3px solid currentColor;
+  background: #fffffff5;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: #167448;
+  transform: rotate(-10deg);
+  font-size: 20px;
+  font-weight: 800;
+  pointer-events: none;
+}
+.swipe-stamp.no {
+  color: #a34a37;
+}
+.swipe-area > .caption {
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .swipe-actions {
+    gap: 10px;
+  }
+  .swipe-actions button {
+    font-size: 12px;
+    padding: 10px;
+  }
+  .swipe-stamp {
+    font-size: 16px;
+  }
+}

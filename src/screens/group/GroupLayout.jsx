@@ -5,6 +5,7 @@ import { ROUTES } from "../../config/routes";
 import { formatDates } from "../../lib/format";
 import { useResource } from "../../hooks/useResource";
 import { groupService } from "../../services/groupService";
+import { requestService } from "../../services/requestService";
 import { useSession } from "../../store/session";
 import { RemoteState } from "../../components/ui";
 
@@ -16,6 +17,16 @@ export function GroupLayout() {
   const [fromSearch] = useState(location.state);
   const resource = useResource(() => groupService.get(groupId), groupId);
   const group = resource.data;
+  // Group detail does not include the owner's pending count. Recheck it whenever
+  // group data refreshes, including after an approval or rejection.
+  const pending = useResource(
+    () =>
+      group?.ownerId === userId
+        ? requestService.listForGroup(group.id, "PENDING")
+        : Promise.resolve([]),
+    group,
+  );
+  const pendingRequestCount = pending.data?.length || 0;
   const back = (
     <button className="text-button back" onClick={() => navigate(-1)}>
       ← Back
@@ -32,8 +43,11 @@ export function GroupLayout() {
 
   const isOwner = group.ownerId === userId;
   const isMember = group.members.some((member) => member.id === userId);
-  const tabs = GROUP_TABS.filter((tab) => (!tab.membersOnly || isMember) && (!tab.ownerOnly || isOwner));
-  const tabUrl = (tab) => (tab.path ? ROUTES.GROUP_TAB(groupId, tab.path) : ROUTES.GROUP(groupId));
+  const tabs = GROUP_TABS.filter(
+    (tab) => (!tab.membersOnly || isMember) && (!tab.ownerOnly || isOwner),
+  );
+  const tabUrl = (tab) =>
+    tab.path ? ROUTES.GROUP_TAB(groupId, tab.path) : ROUTES.GROUP(groupId);
 
   return (
     <>
@@ -50,18 +64,36 @@ export function GroupLayout() {
           </span>
           {isOwner && <span className="badge">You’re the creator</span>}
           {isMember && !isOwner && <span className="badge">Your group</span>}
-          {group.status === "BOOKED" && <span className="badge">Stay confirmed · booking locked</span>}
+          {group.status === "BOOKED" && (
+            <span className="badge">Stay confirmed · booking locked</span>
+          )}
         </div>
       </div>
       <div className="tabs" role="tablist" aria-label="Group sections">
         {tabs.map((tab) => (
-          <button key={tab.label} role="tab" aria-selected={location.pathname === tabUrl(tab)} onClick={() => navigate(tabUrl(tab), { replace: true })}>
+          <button
+            key={tab.label}
+            role="tab"
+            aria-selected={location.pathname === tabUrl(tab)}
+            onClick={() => navigate(tabUrl(tab), { replace: true })}
+          >
             {tab.label}
-            {tab.ownerOnly && group.pendingRequestCount > 0 && <span className="count-badge">{group.pendingRequestCount}</span>}
+            {tab.ownerOnly && pendingRequestCount > 0 && (
+              <span className="count-badge">{pendingRequestCount}</span>
+            )}
           </button>
         ))}
       </div>
-      <Outlet context={{ group, reload: resource.reload, isOwner, isMember, match: fromSearch?.match, searchId: fromSearch?.searchId }} />
+      <Outlet
+        context={{
+          group,
+          reload: resource.reload,
+          isOwner,
+          isMember,
+          match: fromSearch?.match,
+          searchId: fromSearch?.searchId,
+        }}
+      />
     </>
   );
 }

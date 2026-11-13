@@ -7,9 +7,20 @@ import { useResource } from "../../hooks/useResource";
 import { planningService } from "../../services/planningService";
 import { useSession } from "../../store/session";
 import { toast } from "../../store/toast";
-import { Empty, Field, Modal, Money, Notice, RemoteState, Select } from "../../components/ui";
+import {
+  Empty,
+  Field,
+  Modal,
+  Money,
+  Notice,
+  RemoteState,
+  Select,
+} from "../../components/ui";
 
-const STAR_OPTIONS = HOTEL_STAR_OPTIONS.map((stars) => ({ id: String(stars), label: `${stars}+ stars` }));
+const STAR_OPTIONS = HOTEL_STAR_OPTIONS.map((stars) => ({
+  id: String(stars),
+  label: `${stars}+ stars`,
+}));
 
 export function Stays() {
   const { group, reload, isMember } = useOutletContext();
@@ -38,7 +49,10 @@ function PriceBreakdown({ nights, members, totalInr, perMemberInr }) {
 }
 
 function BookingConfirmation({ group }) {
-  const booking = useResource(() => planningService.booking(group.id), group.id);
+  const booking = useResource(
+    () => planningService.booking(group.id),
+    group.id,
+  );
   const data = booking.data;
   if (!data) return <RemoteState resource={booking} />;
   return (
@@ -49,10 +63,19 @@ function BookingConfirmation({ group }) {
         Reference: <strong>{data.id}</strong> · Demo booking, no payment
       </p>
       <p>
-        {formatDates(group.checkIn, group.checkOut)} · {data.rooms} × {data.roomName} · {data.members} travellers
+        {formatDates(group.checkIn, group.checkOut)} · {data.rooms} ×{" "}
+        {data.roomName} · {data.members} travellers
       </p>
-      <PriceBreakdown nights={data.nights} members={data.members} totalInr={data.totalInr} perMemberInr={data.perMemberInr} />
-      <p className="caption">Booked by {data.bookedBy?.name}. This booking is locked for the whole group.</p>
+      <PriceBreakdown
+        nights={data.nights}
+        members={data.members}
+        totalInr={data.totalInr}
+        perMemberInr={data.perMemberInr}
+      />
+      <p className="caption">
+        Booked by {data.bookedBy?.name}. This booking is locked for the whole
+        group.
+      </p>
     </div>
   );
 }
@@ -62,25 +85,37 @@ function HotelSearch({ group, onBooked }) {
   const meta = useMeta();
   const [query, setQuery] = useState({ sort: "", minStars: "", page: 1 });
   const hotels = useResource(
-    () => planningService.hotels(group.id, { ...query, limit: HOTEL_PAGE_SIZE }),
+    () =>
+      planningService.hotels(group.id, { ...query, limit: HOTEL_PAGE_SIZE }),
     `${group.id}:${query.sort}:${query.minStars}:${query.page}`,
   );
-  const saved = useResource(() => planningService.saved(group.id), `saved:${group.id}`);
+  const saved = useResource(
+    () => planningService.saved(group.id),
+    `saved:${group.id}`,
+  );
   const [compare, setCompare] = useState([]);
   const [selected, setSelected] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const savedByRoom = new Map((saved.data ?? []).map((item) => [item.roomId, item]));
-  const savedByMe = (roomId) => Boolean(savedByRoom.get(roomId)?.savedBy.some((member) => member.id === userId));
+  const savedByRoom = new Map(
+    (saved.data ?? []).map((item) => [item.roomId, item]),
+  );
+  const savedByMe = (roomId) =>
+    Boolean(
+      savedByRoom.get(roomId)?.savedBy.some((member) => member.id === userId),
+    );
   const options = hotels.data?.options ?? [];
-  const pages = hotels.data ? Math.ceil(hotels.data.total / hotels.data.limit) : 0;
+  const pages = hotels.data
+    ? Math.ceil(hotels.data.total / hotels.data.limit)
+    : 0;
   const changeQuery = (next) => {
     setQuery({ ...query, ...next });
     setCompare([]);
   };
 
   async function toggleSave(roomId) {
+    if (busy || saved.loading) return;
     setBusy(true);
     setError("");
     try {
@@ -89,6 +124,7 @@ function HotelSearch({ group, onBooked }) {
       saved.reload();
     } catch (failure) {
       setError(failure.message);
+      if (failure.status === 409) onBooked();
     } finally {
       setBusy(false);
     }
@@ -102,7 +138,23 @@ function HotelSearch({ group, onBooked }) {
       toast("Group stay confirmed!");
       onBooked();
     } catch (failure) {
+      // A lost response can arrive after the database committed. Read before retrying.
+      try {
+        const existing = await planningService.booking(group.id);
+        if (existing) {
+          setSelected(null);
+          onBooked();
+          return;
+        }
+      } catch {
+        /* Keep the original error if no booking can be retrieved. */
+      }
       setError(failure.message);
+      if (failure.status === 409) {
+        setSelected(null);
+        onBooked();
+      }
+    } finally {
       setBusy(false);
     }
   }
@@ -114,17 +166,28 @@ function HotelSearch({ group, onBooked }) {
           <span className="eyebrow">FIND YOUR SHARED HOME BASE</span>
           <h2>A stay everyone can agree on.</h2>
           <p className="muted">
-            {group.city} · {formatDates(group.checkIn, group.checkOut)} · {group.memberCount} travellers
+            {group.city} · {formatDates(group.checkIn, group.checkOut)} ·{" "}
+            {group.memberCount} travellers
           </p>
         </div>
       </div>
       <Notice error>{error}</Notice>
       <div className="hotel-filters">
         <Field label="Sort stays">
-          <Select options={meta.data?.hotelSortOptions} placeholder="Default order" value={query.sort} onChange={(e) => changeQuery({ sort: e.target.value, page: 1 })} />
+          <Select
+            options={meta.data?.hotelSortOptions}
+            placeholder="Default order"
+            value={query.sort}
+            onChange={(e) => changeQuery({ sort: e.target.value, page: 1 })}
+          />
         </Field>
         <Field label="Minimum hotel stars">
-          <Select options={STAR_OPTIONS} placeholder="All hotel classes" value={query.minStars} onChange={(e) => changeQuery({ minStars: e.target.value, page: 1 })} />
+          <Select
+            options={STAR_OPTIONS}
+            placeholder="All hotel classes"
+            value={query.minStars}
+            onChange={(e) => changeQuery({ minStars: e.target.value, page: 1 })}
+          />
         </Field>
       </div>
 
@@ -134,12 +197,18 @@ function HotelSearch({ group, onBooked }) {
           {saved.data.map((item) => (
             <div key={item.roomId} className="request-row">
               <div>
-                <strong>{item.hotelName}</strong> · {item.rooms} × {item.roomName}
+                <strong>{item.hotelName}</strong> · {item.rooms} ×{" "}
+                {item.roomName}
                 <p className="muted">
-                  {item.alignment} · {item.savedBy.map((member) => member.name).join(", ")} · <Money value={item.perMemberInr} /> each
+                  {item.alignment} ·{" "}
+                  {item.savedBy.map((member) => member.name).join(", ")} ·{" "}
+                  <Money value={item.perMemberInr} /> each
                 </p>
               </div>
-              <button disabled={busy || !item.available} onClick={() => setSelected(item)}>
+              <button
+                disabled={busy || !item.available}
+                onClick={() => setSelected(item)}
+              >
                 {item.available ? "Review & book" : "No longer available"}
               </button>
             </div>
@@ -149,12 +218,18 @@ function HotelSearch({ group, onBooked }) {
 
       <RemoteState resource={hotels} />
       {hotels.data && options.length === 0 && (
-        <Empty title="No stays available for this group">No hotel has enough free rooms on every night. Try another hotel class.</Empty>
+        <Empty title="No stays available for this group">
+          No hotel has enough free rooms on every night. Try another hotel
+          class.
+        </Empty>
       )}
       <div className="hotel-list">
         {options.map((option) => (
           <article key={option.roomId} className="hotel-card">
-            <div className="hotel-image" style={{ backgroundImage: `url("${assetUrl(option.image)}")` }} />
+            <div
+              className="hotel-image"
+              style={{ backgroundImage: `url("${assetUrl(option.image)}")` }}
+            />
             <div className="hotel-content">
               <div className="section-heading">
                 <div>
@@ -166,18 +241,32 @@ function HotelSearch({ group, onBooked }) {
                 <span className="rating">{option.rating}</span>
               </div>
               <p>
-                {option.rooms} × {option.roomName} · {hotels.data.membersUsed} travellers
+                {option.rooms} × {option.roomName} · {hotels.data.membersUsed}{" "}
+                travellers
               </p>
               <div className="chips">
                 <span className="chip">{option.stars} stars</span>
-                <span className="chip">{option.refundable ? "Free cancellation" : "Non-refundable"}</span>
+                <span className="chip">
+                  {option.refundable ? "Free cancellation" : "Non-refundable"}
+                </span>
               </div>
-              <PriceBreakdown nights={option.nights} members={hotels.data.membersUsed} totalInr={option.totalInr} perMemberInr={option.perMemberInr} />
+              <PriceBreakdown
+                nights={option.nights}
+                members={hotels.data.membersUsed}
+                totalInr={option.totalInr}
+                perMemberInr={option.perMemberInr}
+              />
               <p className="caption">
-                {savedByRoom.get(option.roomId)?.alignment ?? `0/${group.memberCount} members`} saved this
+                {savedByRoom.get(option.roomId)?.alignment ??
+                  `0/${group.memberCount} members`}{" "}
+                saved this
               </p>
               <div className="actions">
-                <button className="secondary" disabled={busy} onClick={() => toggleSave(option.roomId)}>
+                <button
+                  className="secondary"
+                  disabled={busy || saved.loading}
+                  onClick={() => toggleSave(option.roomId)}
+                >
                   {savedByMe(option.roomId) ? "♥ Saved" : "♡ Shortlist"}
                 </button>
                 <button disabled={busy} onClick={() => setSelected(option)}>
@@ -188,7 +277,13 @@ function HotelSearch({ group, onBooked }) {
                 <input
                   type="checkbox"
                   checked={compare.includes(option.roomId)}
-                  onChange={(e) => setCompare(e.target.checked ? [...compare, option.roomId] : compare.filter((id) => id !== option.roomId))}
+                  onChange={(e) =>
+                    setCompare(
+                      e.target.checked
+                        ? [...compare, option.roomId]
+                        : compare.filter((id) => id !== option.roomId),
+                    )
+                  }
                 />{" "}
                 Compare this option
               </label>
@@ -214,7 +309,12 @@ function HotelSearch({ group, onBooked }) {
                   <p>
                     {option.rooms} × {option.roomName}
                   </p>
-                  <PriceBreakdown nights={option.nights} members={hotels.data.membersUsed} totalInr={option.totalInr} perMemberInr={option.perMemberInr} />
+                  <PriceBreakdown
+                    nights={option.nights}
+                    members={hotels.data.membersUsed}
+                    totalInr={option.totalInr}
+                    perMemberInr={option.perMemberInr}
+                  />
                   <p className="muted">
                     {option.stars} stars · rating {option.rating}
                   </p>
@@ -229,33 +329,56 @@ function HotelSearch({ group, onBooked }) {
 
       {pages > 1 && (
         <div className="actions pagination">
-          <button className="secondary" disabled={query.page === 1} onClick={() => changeQuery({ page: query.page - 1 })}>
+          <button
+            className="secondary"
+            disabled={query.page === 1}
+            onClick={() => changeQuery({ page: query.page - 1 })}
+          >
             Previous page
           </button>
           <span>
             Page {query.page} of {pages}
           </span>
-          <button className="secondary" disabled={query.page >= pages} onClick={() => changeQuery({ page: query.page + 1 })}>
+          <button
+            className="secondary"
+            disabled={query.page >= pages}
+            onClick={() => changeQuery({ page: query.page + 1 })}
+          >
             Next page
           </button>
         </div>
       )}
 
       {selected && (
-        <Modal title="Confirm your group’s stay" onClose={() => !busy && setSelected(null)}>
+        <Modal
+          title="Confirm your group’s stay"
+          onClose={() => !busy && setSelected(null)}
+        >
           <h3>{selected.hotelName}</h3>
           <p>{formatDates(group.checkIn, group.checkOut)}</p>
           <p>
             {selected.rooms} × {selected.roomName}
           </p>
-          <PriceBreakdown nights={selected.nights} members={group.memberCount} totalInr={selected.totalInr} perMemberInr={selected.perMemberInr} />
-          <Notice>Confirm only after your group agrees. This creates one locked demo booking for all members. No payment is taken.</Notice>
+          <PriceBreakdown
+            nights={selected.nights}
+            members={group.memberCount}
+            totalInr={selected.totalInr}
+            perMemberInr={selected.perMemberInr}
+          />
+          <Notice>
+            Confirm only after your group agrees. This creates one locked demo
+            booking for all members. No payment is taken.
+          </Notice>
           <Notice error>{error}</Notice>
           <div className="actions">
             <button disabled={busy} onClick={book}>
               {busy ? "Confirming…" : "Confirm group booking"}
             </button>
-            <button className="secondary" disabled={busy} onClick={() => setSelected(null)}>
+            <button
+              className="secondary"
+              disabled={busy}
+              onClick={() => setSelected(null)}
+            >
               Keep comparing
             </button>
           </div>

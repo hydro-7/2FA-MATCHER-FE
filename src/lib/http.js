@@ -12,8 +12,12 @@ export class ApiError extends Error {
 
 function buildUrl(path, query) {
   if (!query) return API_URL + path;
-  const params = Object.entries(query).filter(([, value]) => value !== undefined && value !== "");
-  return params.length ? `${API_URL}${path}?${new URLSearchParams(params)}` : API_URL + path;
+  const params = Object.entries(query).filter(
+    ([, value]) => value !== undefined && value !== "",
+  );
+  return params.length
+    ? `${API_URL}${path}?${new URLSearchParams(params)}`
+    : API_URL + path;
 }
 
 async function request(method, path, { body, query } = {}) {
@@ -32,13 +36,34 @@ async function request(method, path, { body, query } = {}) {
     });
   } catch (error) {
     const timedOut = error.name === "TimeoutError";
-    throw new ApiError(timedOut ? "The server took too long to respond." : "Cannot reach the server.", 0);
+    throw new ApiError(
+      timedOut
+        ? "The server took too long to respond."
+        : "Cannot reach the server.",
+      0,
+    );
   }
 
   const json = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new ApiError(json?.message || `Request failed (${response.status})`, response.status, json?.error?.code);
+  if (useSession.getState().userId !== userId) {
+    throw new ApiError(
+      "The selected traveller changed. Please retry with the current profile.",
+      0,
+      "IDENTITY_CHANGED",
+    );
   }
+  if (!response.ok) {
+    throw new ApiError(
+      json?.message || `Request failed (${response.status})`,
+      response.status,
+      json?.error?.code,
+    );
+  }
+  if (!json || json.success === false)
+    throw new ApiError(
+      json?.message || "The server returned an unexpected response.",
+      response.status,
+    );
   return json?.data ?? null;
 }
 
