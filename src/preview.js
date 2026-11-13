@@ -1,7 +1,7 @@
 // Isolated, explicitly labelled visual examples. Never used by live API mode.
 // State lasts only for this page load; this is not a backend or matching engine.
-import interests from "../../data-pack/hackathon-problem-3-group-travel-matcher/data/problem-3/interests.json";
-import destinations from "../../data-pack/hackathon-problem-3-group-travel-matcher/data/catalog/destinations.json";
+import interests from "./preview-data/interests.json";
+import destinations from "./preview-data/destinations.json";
 
 const sarah = {
   id: "preview-sarah",
