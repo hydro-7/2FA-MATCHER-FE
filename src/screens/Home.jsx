@@ -85,9 +85,6 @@ export function Home() {
     <div className="landing">
       <section className="landing-hero">
         <div className="hero-copy">
-          <span className="hero-chip">
-            <Users size={20} /> Group Travel Matcher
-          </span>
           <h1>
             Turn solo plans into a <br />
             <span className="accent">

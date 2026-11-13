@@ -105,8 +105,8 @@ export function AppLayout() {
     <>
       <header className="topbar">
         <div className="topbar-inner">
-          <Link to={ROUTES.HOME} className="logo">
-            <span className="logo-mark">b.</span>
+          <Link to={ROUTES.HOME} className="logo" aria-label="Travel Together home">
+            <img className="logo-mark" src="/booking-logo.png" alt="" />
             <span className="logo-text">Travel Together</span>
           </Link>
           <nav className="topnav" aria-label="Main">
