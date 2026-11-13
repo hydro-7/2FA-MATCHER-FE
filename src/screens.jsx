@@ -99,8 +99,16 @@ export function Profile({ catalog, profile, onSaved }) {
                 required
                 maxLength={100}
                 value={form.homeCity}
+                list="home-cities"
                 onChange={(e) => change("homeCity", e.target.value)}
               />
+              <datalist id="home-cities">
+                {catalog.data?.homeCities?.map((city) => (
+                  <option key={city.id} value={city.id}>
+                    {city.label}
+                  </option>
+                ))}
+              </datalist>
             </Field>
             <Field label="Age (optional)">
               <input
@@ -120,7 +128,10 @@ export function Profile({ catalog, profile, onSaved }) {
               />
             </Field>
           </div>
-          <Field label="Travel group gender preference">
+          <Field
+            label="Travel group gender preference"
+            hint="Same gender only means female-only for women and male-only for men."
+          >
             <CatalogSelect
               required
               options={catalog.data?.genderPreferences}

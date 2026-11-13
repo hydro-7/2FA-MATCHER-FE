@@ -20,7 +20,10 @@ async function request(path, method = "GET", body) {
   const data = await response.json().catch(() => null);
   if (!response.ok) {
     throw new Error(
-      data?.message || `Request failed (${response.status}). Please try again.`,
+      data?.message ||
+        ([502, 503, 504].includes(response.status)
+          ? "The backend is unavailable. Start the API server and retry."
+          : `Request failed (${response.status}). Please try again.`),
     );
   }
   if (data === null)
