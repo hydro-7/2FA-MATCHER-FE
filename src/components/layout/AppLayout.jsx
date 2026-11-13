@@ -123,7 +123,7 @@ export function AppLayout() {
           <div className="topbar-actions">
             <Link to={ROUTES.DISCOVER} className="pill-btn" aria-label="Search groups">
               <Search size={20} />
-              <kbd>⌘K</kbd>
+              <kbd>Search</kbd>
             </Link>
             {profile && (
               <Link to={ROUTES.TRIPS} className="round-btn" aria-label={`${pending} pending join requests`}>
