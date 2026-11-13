@@ -5,8 +5,8 @@ import { parseItinerary } from "../../lib/itinerary";
 import { ItineraryView } from "../../components/ItineraryView";
 import { Workspace } from "./Workspace";
 
-function genderPreferenceLabel(owner) {
-  if (owner?.genderPreference !== "SAME_GENDER") return labelOf("genderPreference", "ANY");
+function genderPreferenceLabel(group, owner) {
+  if (group.genderPreference !== "SAME_GENDER" || !owner) return labelOf("genderPreference", "ANY");
   return `${labelOf("gender", owner.gender)} only`;
 }
 
@@ -22,7 +22,7 @@ function TripOverview({ group }) {
   const stats = [
     { icon: Users, label: "Group size", value: `${group.maxSize} people` },
     { icon: Wallet, label: "Budget", hint: "(per person)", value: formatMoney(group.budgetInr) },
-    { icon: UserRoundCheck, label: "Travels with", value: genderPreferenceLabel(owner) },
+    { icon: UserRoundCheck, label: "Travels with", value: genderPreferenceLabel(group, owner) },
   ];
   if (group.booking)
     stats.push({ icon: BedDouble, label: "Booked stay", hint: `(${formatMoney(group.booking.perMemberInr)} each)`, value: group.booking.hotelName });

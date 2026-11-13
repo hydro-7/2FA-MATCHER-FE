@@ -1,54 +1,71 @@
-# Travel Together — frontend
+# Travel Together: frontend
 
-React + Vite client for the Group Travel Matcher. All data comes from the backend API. The app reads no data-pack files.
+React client for the Group Travel Matcher. Every screen reads from the backend API. Nothing is mocked.
 
-## Start
+React 19, Vite, React Router, zustand, Leaflet.
 
-Requires Node.js 22+ and the backend running on `http://localhost:8000`.
+## Run
 
-```sh
-npm install
-npm run dev
-```
+Needs Node 22 or newer, pnpm, and the backend running on `http://localhost:8000`. Start the backend first and wait for its `Server running` line.
 
-Open http://localhost:5173. Vite proxies `/api` and `/images` to `VITE_BACKEND_ORIGIN` (see `.env.example`).
+    pnpm install
+    pnpm dev
 
-## Structure
+Open http://localhost:5173. Sign in and sign up share one popup, opened from the header or by any page that needs an account. Sign up, or sign in as a seeded traveller: `t-001@demo.travel` with the backend's `DEMO_PASSWORD` (default `demo1234`).
 
-```
-src/
-  config/      env.js (reads import.meta.env), endpoints.js (API routes), routes.js (page URLs)
-  constants/   data only: app settings, enum labels
-  lib/         http.js (fetch client), format.js (money, dates, labels, asset URLs)
-  store/       zustand: session (persisted traveller id), search results, toasts
-  services/    one per backend domain: meta, traveller, group, match, request, planning, message
-  hooks/       useResource (load/error/reload), useMeta (form options from /meta)
-  components/  ui primitives, GroupCard, SearchForm, IdentityModal, layout/
-  screens/     one file per route; screens/group/ holds the group tabs
-```
+No `.env` is needed for local work. To change the defaults, copy `.env.example` to `.env`:
 
-Screens call services only, services call `http` with `API_ENDPOINTS`, and only `lib/http.js` uses `fetch`.
+| Variable | Meaning |
+| --- | --- |
+| `VITE_BACKEND_ORIGIN` | Where the dev server proxies `/api` and `/images`. Default `http://localhost:8000`. |
+| `VITE_API_URL` | Call the API directly instead of through the proxy. |
+| `VITE_PORT` | Dev server port. Default `5173`. |
+
+## Commands
+
+| Command | Does |
+| --- | --- |
+| `pnpm dev` | Dev server with hot reload. |
+| `pnpm build` | Production build into `dist/`. |
+| `pnpm preview` | Serve `dist/` locally. |
+
+## Layout
+
+    src/config      env, API endpoints, page URLs
+    src/constants   settings and labels
+    src/lib         http client, formatting
+    src/store       zustand: session (token), search, drafts, theme, toasts
+    src/services    one per backend domain
+    src/hooks       useResource, useMeta
+    src/components  shared UI
+    src/screens     one per route, group tabs in screens/group
+
+Screens call services. Services call `lib/http.js`. Only `lib/http.js` uses `fetch`, and it adds the `Authorization: Bearer` header.
 
 ## Routes
 
 | Path | Screen |
-|---|---|
+| --- | --- |
 | `/` | Home |
-| `/profile` | Sign up / your profile (M1) |
-| `/groups/new` | Create a group (M2) |
-| `/discover` | Search, matches, filters, near misses (M3, M4, G1) |
-| `/trips` | Your groups (pending badge) and sent requests |
-| `/groups/:id` | Overview and "I'm interested" (M5) |
+| `/profile` | Your profile |
+| `/discover` | Search, matches, near misses |
+| `/groups/new` | Create a trip |
+| `/trips` | Your groups and sent requests |
+| `/groups/:id` | Trip overview and join request |
 | `/groups/:id/members` | Members |
-| `/groups/:id/stays` | Hotels, per-person cost, shortlist, compare, confirm booking (M6) |
-| `/groups/:id/chat` | Group chat (S1) |
-| `/groups/:id/requests` | Approve / decline (M5, owner only) |
-| `/travellers/:id` | Member profile and their groups (G2) |
+| `/groups/:id/stays` | Hotels, cost per person, booking |
+| `/groups/:id/chat` | Group chat |
+| `/groups/:id/requests` | Approve or decline, owner only |
+| `/travellers/:id` | A traveller's profile |
 
-## Known limitations
+## Problems
 
-- Identity is a demo session with no password, as M1 allows.
-- Profiles can't be edited because the API has no update route.
-- Chat refreshes by polling every few seconds.
+- `http proxy error ... ECONNREFUSED 127.0.0.1:8000`: the backend is not running. Start it, then reload.
+- Signed out on every request: the token expired (7 days) or the backend's `AUTH_SECRET` changed. Sign in again.
+- A `companion.bundle.js` error in the console comes from a browser extension, not this app.
 
-Hotel photo credits: linked in the footer, served from the data pack's `images/ATTRIBUTIONS.md`.
+## Limits
+
+- Profiles cannot be edited. The API has no update route.
+- No password reset.
+- Chat polls every few seconds.

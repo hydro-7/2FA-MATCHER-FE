@@ -30,8 +30,8 @@ export function App() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<Home />} />
-          <Route path="profile" element={<Profile />} />
           <Route element={<RequireProfile />}>
+            <Route path="profile" element={<Profile />} />
             <Route path="start" element={<Start />} />
             <Route path="discover" element={<Discover />} />
             <Route path="trips" element={<MyTrips />} />

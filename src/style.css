@@ -1738,3 +1738,84 @@ footer a {
     font-size: 16px;
   }
 }
+
+dialog.wide {
+  width: min(720px, calc(100% - 30px));
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--subtle);
+}
+
+.auth-tabs button {
+  min-height: 40px;
+  padding: 0;
+  background: none;
+  color: var(--ink-soft);
+}
+
+.auth-tabs button.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.auth-form .actions {
+  justify-content: space-between;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.auth-choice,
+.auth-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.auth-choice button,
+.auth-chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--ring);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.auth-choice button {
+  flex: 1;
+  justify-content: center;
+  min-height: 45px;
+}
+
+.auth-chips button {
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.auth-choice button.selected,
+.auth-chips button.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+@media (max-width: 560px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
+}

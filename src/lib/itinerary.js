@@ -48,3 +48,13 @@ export function parseItinerary(text = "") {
   }
   return { ...result, summary: result.summary.join("\n\n") };
 }
+
+// Trips written as one line ("Tsukiji market, Shibuya crossing at night, Akihabara") have no day plan:
+// read the listed places so the map still has something to pin.
+export function placesFromText(text = "", max = 8) {
+  const parts = text
+    .split(/[,;\n]|\.\s|\s(?:and|then)\s|\s[-–]\s/)
+    .map((part) => part.replace(/\.$/, "").trim())
+    .filter((part) => part.length >= 3 && part.length <= 60 && part.split(/\s+/).length <= 6);
+  return [...new Set(parts)].slice(0, max).map((placeText) => ({ time: "", text: placeText }));
+}

@@ -11,6 +11,9 @@ export const API_ENDPOINTS = {
   FRIEND: (travellerId) => `/friends/${id(travellerId)}`,
 
   TRAVELLERS: "/travellers",
+  SIGN_IN: "/travellers/sign-in",
+  DEMO_TRAVELLERS: "/travellers/demo",
+  DEMO_SIGN_IN: "/travellers/demo/sign-in",
   TRAVELLER: (travellerId) => `/travellers/${id(travellerId)}`,
 
   GROUPS: "/groups",

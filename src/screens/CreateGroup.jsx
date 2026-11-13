@@ -69,6 +69,8 @@ function TripWizard({ meta, step, setStep }) {
   const setPlan = (value) => update({ plan: value });
   const setActiveDay = (value) => update({ activeDay: value });
   const setStyle = (value) => update({ style: value });
+  // Per trip; starts from the profile setting.
+  const genderPreference = draft.genderPreference ?? profile.genderPreference;
   const setRules = (value) => update({ rules: value });
   const [ruleDraft, setRuleDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -125,6 +127,7 @@ function TripWizard({ meta, step, setStep }) {
         maxSize: Number(trip.maxSize),
         budgetInr: Number(trip.budgetInr),
         itinerary,
+        genderPreference,
       });
       clear();
       toast("Trip published. Join requests will show up on your group page.");
@@ -326,9 +329,15 @@ function TripWizard({ meta, step, setStep }) {
               </span>
               <div className="pill-options">
                 {meta.genderPreferenceOptions.map((option) => {
-                  const selected = profile.genderPreference === option.id;
+                  const selected = genderPreference === option.id;
                   return (
-                    <button key={option.id} type="button" className={selected ? "selected" : ""} disabled={!selected} aria-pressed={selected}>
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={selected ? "selected" : ""}
+                      aria-pressed={selected}
+                      onClick={() => update({ genderPreference: option.id })}
+                    >
                       {option.id === "SAME_GENDER" ? `${GENDER_GLYPHS[profile.gender] ?? ""} ${labelOf("gender", profile.gender)} only` : "Any"}
                       {selected && <Check size={16} />}
                     </button>
@@ -336,7 +345,7 @@ function TripWizard({ meta, step, setStep }) {
                 })}
               </div>
               <small className="field-hint">
-                Uses your <Link to={ROUTES.PROFILE}>profile</Link> setting. Both sides must allow each other to match.
+                Applies to this trip only. Only travellers this setting allows can request to join.
               </small>
             </div>
             <div className="pref-block">

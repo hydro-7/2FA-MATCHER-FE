@@ -88,6 +88,7 @@ function HotelSearch({ group, onBooked }) {
     () =>
       planningService.hotels(group.id, { ...query, limit: HOTEL_PAGE_SIZE }),
     `${group.id}:${query.sort}:${query.minStars}:${query.page}`,
+    { keepPrevious: true },
   );
   const saved = useResource(
     () => planningService.saved(group.id),
@@ -223,7 +224,7 @@ function HotelSearch({ group, onBooked }) {
           class.
         </Empty>
       )}
-      <div className="hotel-list">
+      <div className="hotel-list" aria-busy={hotels.loading} style={hotels.loading ? { opacity: 0.55 } : undefined}>
         {options.map((option) => (
           <article key={option.roomId} className="hotel-card">
             <div

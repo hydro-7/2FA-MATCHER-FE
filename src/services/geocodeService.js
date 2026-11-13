@@ -1,9 +1,11 @@
 import { MAP_CONFIG } from "../config/map";
 import { GEOCODE, STORAGE_KEYS } from "../constants/app";
 
+// Misses saved by earlier versions are dropped, so a place gets another try with the current lookup rules.
 function readCache() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.GEOCODE)) ?? {};
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.GEOCODE)) ?? {};
+    return Object.fromEntries(Object.entries(saved).filter(([, point]) => point));
   } catch {
     return {};
   }
@@ -14,8 +16,10 @@ let queue = Promise.resolve();
 
 function remember(key, value) {
   cache[key] = value;
+  // A miss is remembered for this session only.
+  if (!value) return;
   try {
-    localStorage.setItem(STORAGE_KEYS.GEOCODE, JSON.stringify(cache));
+    localStorage.setItem(STORAGE_KEYS.GEOCODE, JSON.stringify(cache, (_key, item) => (item === null ? undefined : item)));
   } catch {
     // Storage full or blocked: the in-memory cache still works for this session.
   }
@@ -43,11 +47,18 @@ function search(query, near, isActive = () => true) {
   return run;
 }
 
-// Free-text activities ("Fushimi Inari Shrine visit") often only match once trailing words are dropped.
-function candidates(text) {
+const FILLER = new Set(
+  "a an and at by for from in of on the to with visit visiting lunch dinner breakfast brunch tour walk stroll trip explore exploring shopping sunset sunrise morning evening night".split(" "),
+);
+
+// Free-text activities ("Lunch at Nishiki Market", "Fushimi Inari Shrine visit") rarely match as typed:
+// try the text, then the place words without activity words, then shorter prefixes of those.
+export function candidates(text) {
   const words = text.replace(/[&,()]/g, " ").split(/\s+/).filter(Boolean);
-  const lengths = [words.length, GEOCODE.SHORT_WORDS].filter((n) => n <= words.length);
-  return [...new Set(lengths.map((n) => words.slice(0, n).join(" ")))].filter(Boolean);
+  const place = words.filter((word) => !FILLER.has(word.toLowerCase()));
+  // The place name can also sit at the end ("photo day in Arashiyama").
+  const queries = [words, place, place.slice(0, GEOCODE.SHORT_WORDS), place.slice(0, 2), place.slice(-2), place.slice(-1)].map((list) => list.join(" "));
+  return [...new Set(queries)].filter(Boolean);
 }
 
 export function cachedPlace(text, city) {

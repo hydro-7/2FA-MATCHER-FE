@@ -21,10 +21,10 @@ function buildUrl(path, query) {
 }
 
 async function request(method, path, { body, query } = {}) {
-  const { userId } = useSession.getState();
+  const { userId, token } = useSession.getState();
   const headers = {};
   if (body) headers["Content-Type"] = "application/json";
-  if (userId) headers["X-User-Id"] = userId;
+  if (token) headers.Authorization = `Bearer ${token}`;
 
   let response;
   try {
