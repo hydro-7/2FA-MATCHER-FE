@@ -1,96 +1,231 @@
-import { useEffect, useState } from 'react'
+import { useState } from "react";
+import { api } from "./api";
+import { Avatar, Notice, useResource } from "./components";
+import {
+  Profile,
+  TripForm,
+  Discover,
+  MyTrips,
+  GroupDetail,
+  MemberProfile,
+} from "./screens";
 
-function App() {
-  const [items, setItems] = useState([])
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [message, setMessage] = useState('Loading...')
+export default function App() {
+  const catalog = useResource(api.catalog, "catalog");
+  const session = useResource(api.session, "session");
+  const [page, setPage] = useState({ name: "home" });
+  const [profileOverride, setProfileOverride] = useState(null);
+  const profile = profileOverride || session.data?.profile;
 
-  async function loadItems() {
-    try {
-      const response = await fetch('/api/items')
-      const data = await response.json()
-      setItems(data)
-      setMessage('')
-    } catch (error) {
-      setMessage('Could not reach the backend')
-    }
+  function navigate(name, id) {
+    setPage({ name, id });
+    window.scrollTo({ top: 0 });
   }
 
-  async function addItem(event) {
-    event.preventDefault()
-
-    const response = await fetch('/api/items', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, description }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      setMessage(error.message)
-      return
-    }
-
-    setName('')
-    setDescription('')
-    setMessage('Item added')
-    loadItems()
+  function requireProfile(name) {
+    navigate(profile ? name : "profile");
   }
-
-  async function deleteItem(id) {
-    await fetch(`/api/items/${id}`, { method: 'DELETE' })
-    loadItems()
-  }
-
-  useEffect(() => {
-    loadItems()
-  }, [])
 
   return (
-    <main>
-      <p className="eyebrow">Simple MERN starter</p>
-      <h1>Booking</h1>
-      <p className="lede">A plain React and Express app that is easy to change by hand.</p>
-
-      <section>
-        <h2>Add an item</h2>
-
-        <form onSubmit={addItem}>
-          <label>
-            Name
-            <input value={name} onChange={(event) => setName(event.target.value)} required />
-          </label>
-
-          <label>
-            Description
-            <textarea
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-            />
-          </label>
-
-          <button type="submit">Add item</button>
-        </form>
-
-        {message && <p className="message">{message}</p>}
-
-        <div className="items">
-          {items.map((item) => (
-            <article key={item._id}>
-              <div>
-                <h3>{item.name}</h3>
-                <p>{item.description || 'No description'}</p>
-              </div>
-              <button className="delete" onClick={() => deleteItem(item._id)}>
-                Delete
-              </button>
-            </article>
-          ))}
+    <>
+      <header className="site-header">
+        <div className="header-inner">
+          <button
+            className="brand"
+            onClick={() => navigate("home")}
+            aria-label="Travel Together home"
+          >
+            <span className="brand-symbol">b.</span>
+            <span>
+              Travel Together
+              <small>A little company. A bigger adventure.</small>
+            </span>
+          </button>
+          <span className="header-note">Find your people. Go together.</span>
+          <button
+            className="profile-button"
+            aria-label={
+              profile ? `${profile.name}, edit profile` : "Your profile"
+            }
+            onClick={() => navigate("profile")}
+          >
+            <Avatar person={profile} />
+            <span>{profile?.name || "Your profile"}</span>
+          </button>
         </div>
-      </section>
-    </main>
-  )
+      </header>
+      <nav className="main-nav" aria-label="Main navigation">
+        <div>
+          <button
+            className={page.name === "discover" ? "active" : ""}
+            onClick={() => requireProfile("discover")}
+          >
+            ◎ Discover groups
+          </button>
+          <button
+            className={page.name === "trips" ? "active" : ""}
+            onClick={() => requireProfile("trips")}
+          >
+            ▧ My trips
+          </button>
+          <button
+            className={page.name === "create" ? "active" : ""}
+            onClick={() => requireProfile("create")}
+          >
+            ＋ Create a group
+          </button>
+        </div>
+      </nav>
+      <main>
+        {page.name === "home" && (
+          <>
+            <section className="hero">
+              <div>
+                <span className="eyebrow">
+                  GOOD TRIPS START WITH GOOD COMPANY
+                </span>
+                <h1>
+                  Your next adventure.
+                  <br />
+                  <span>Your kind of people.</span>
+                </h1>
+                <p>
+                  Meet travellers who share your interests, plan a trip
+                  together, and make room for new stories.
+                </p>
+                <div className="actions">
+                  <button onClick={() => requireProfile("discover")}>
+                    Find my travel people ↗
+                  </button>
+                  <button
+                    className="secondary"
+                    onClick={() => requireProfile("create")}
+                  >
+                    Create a group
+                  </button>
+                </div>
+                <div className="hero-foot">
+                  <span>✓ Shared interests</span>
+                  <span>✓ Clear costs</span>
+                  <span>✓ You choose your group</span>
+                </div>
+              </div>
+              <div className="travel-art" aria-hidden="true">
+                <div className="art-sun" />
+                <div className="art-mountain back" />
+                <div className="art-mountain" />
+                <div className="art-path" />
+                <span className="art-label">More than a destination.</span>
+                <div className="art-ticket">
+                  <span>THE BEST PART OF THE TRIP?</span>
+                  <strong>The people you meet.</strong>
+                  <span>✦ &nbsp; TRAVEL TOGETHER &nbsp; ✦</span>
+                </div>
+              </div>
+            </section>
+            <section className="intro-grid">
+              <article>
+                <span>01</span>
+                <h3>Find your kind of trip</h3>
+                <p>Explore groups that fit your dates, budget and interests.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <h3>Make a connection</h3>
+                <p>Send a request. Your trip creator welcomes you aboard.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <h3>Plan the stay together</h3>
+                <p>Compare hotels and see exactly what each person pays.</p>
+              </article>
+            </section>
+            {session.loading && (
+              <p className="muted" role="status">
+                Checking your saved profile…
+              </p>
+            )}
+            {session.error && (
+              <Notice error>
+                Profile service: {session.error}{" "}
+                <button className="text-button" onClick={session.reload}>
+                  Retry
+                </button>
+              </Notice>
+            )}
+          </>
+        )}
+        {page.name === "profile" && (
+          <Profile
+            catalog={catalog}
+            profile={profile}
+            onSaved={(saved) => {
+              setProfileOverride(saved);
+              navigate("choose");
+            }}
+          />
+        )}
+        {page.name === "choose" && (
+          <section className="narrow">
+            <span className="eyebrow">YOU’RE READY TO GO</span>
+            <h1>
+              Where do we start{profile?.name ? `, ${profile.name}` : ""}?
+            </h1>
+            <p className="lede">
+              Lead an adventure or find a group that feels like you.
+            </p>
+            <div className="choice-grid">
+              <button className="choice" onClick={() => navigate("create")}>
+                <span>＋</span>
+                <h2>Plan a trip</h2>
+                <p>Create a group and welcome your travel companions.</p>
+                <strong>Create a group →</strong>
+              </button>
+              <button className="choice" onClick={() => navigate("discover")}>
+                <span>◎</span>
+                <h2>Find your people</h2>
+                <p>Discover trips that fit your interests, dates and budget.</p>
+                <strong>Explore groups →</strong>
+              </button>
+            </div>
+          </section>
+        )}
+        {page.name === "create" && (
+          <TripForm
+            catalog={catalog}
+            mode="create"
+            profile={profile}
+            onCreated={(group) => navigate("group", group.id)}
+          />
+        )}
+        {page.name === "discover" && (
+          <Discover
+            catalog={catalog}
+            profile={profile}
+            onOpen={(id) => navigate("group", id)}
+          />
+        )}
+        {page.name === "trips" && (
+          <MyTrips
+            onOpen={(id) => navigate("group", id)}
+            onExplore={() => navigate("discover")}
+          />
+        )}
+        {page.name === "group" && (
+          <GroupDetail
+            key={page.id}
+            id={page.id}
+            onMember={(id) => navigate("member", id)}
+            onBack={() => navigate("discover")}
+          />
+        )}
+        {page.name === "member" && (
+          <MemberProfile id={page.id} onOpen={(id) => navigate("group", id)} />
+        )}
+      </main>
+      <footer>
+        Travel Together <span>Made for shared adventures.</span>
+      </footer>
+    </>
+  );
 }
-
-export default App
