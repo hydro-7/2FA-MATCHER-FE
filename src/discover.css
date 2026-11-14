@@ -65,7 +65,8 @@ main:has(> .trips-page) {
 }
 
 .sort-box .dropdown-trigger,
-.boxed .dropdown-trigger {
+.boxed .dropdown-trigger,
+.boxed .dropdown input {
   min-height: 0;
   padding: 0 28px 0 0;
   border: 0;
@@ -178,6 +179,16 @@ main:has(> .trips-page) {
 
 .boxed .dropdown {
   flex: 1;
+}
+
+.boxed .dropdown input {
+  width: 100%;
+  min-height: 46px;
+  color: var(--ink);
+}
+
+.boxed .dropdown input:focus {
+  outline: none;
 }
 
 .boxed .dropdown-menu {
@@ -296,31 +307,30 @@ main:has(> .trips-page) {
 .match-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
 .match-tags span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 700;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--ring);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
 }
 
 .tag-green {
-  background: var(--green-soft);
   color: var(--green-ink);
 }
 
 .tag-orange {
-  background: var(--amber-soft);
-  color: var(--amber-ink);
+  color: var(--ink-soft);
 }
 
 .tag-blue {
-  background: var(--brand-soft);
   color: var(--brand);
 }
 
@@ -421,42 +431,28 @@ main:has(> .trips-page) {
 
 .near-miss {
   margin-top: 10px;
-  padding: 22px;
-  border: 1px solid var(--amber-line);
-  border-radius: 22px;
-  background: linear-gradient(180deg, var(--amber-soft), var(--surface) 70%);
-  box-shadow: 0 6px 22px rgb(245 158 11 / 10%);
+  padding: 20px;
+  border: 1px solid var(--ring);
+  border-radius: 16px;
+  background: var(--surface);
 }
 
 .near-miss header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
-.near-icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--amber-soft);
-  color: var(--amber-ink);
-}
 
 .near-miss h3 {
   margin: 0;
   color: var(--ink);
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .near-miss header p {
   margin: 2px 0 0;
   color: var(--ink-soft);
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .near-grid {
@@ -477,7 +473,7 @@ main:has(> .trips-page) {
 }
 
 .near-card:hover {
-  border-color: var(--amber-line);
+  border-color: var(--ink-soft);
 }
 
 .near-photo {
@@ -512,9 +508,9 @@ main:has(> .trips-page) {
   display: inline-flex;
   align-items: flex-start;
   gap: 6px;
-  color: var(--amber-ink);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .near-reason svg {
@@ -526,20 +522,20 @@ main:has(> .trips-page) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 42px;
-  padding: 0 16px;
-  border: 1px solid var(--brand);
-  border-radius: 12px;
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-size: 14px;
-  font-weight: 700;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--ring);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
 }
 
 .fix-btn:hover {
-  background: var(--brand);
-  color: #fff;
+  border-color: var(--brand);
+  color: var(--brand);
   filter: none;
 }
 
@@ -792,4 +788,58 @@ main:has(> .trips-page) {
 .boxed.dates input::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.6;
+}
+
+.match-itinerary {
+  display: grid;
+  gap: 8px;
+}
+
+.match-days {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.match-days li {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.match-days b {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--brand-soft);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.match-days small {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.match-days span {
+  overflow: hidden;
+  color: var(--ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-days strong {
+  margin-right: 6px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.match-days .match-days-more {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 13px;
 }

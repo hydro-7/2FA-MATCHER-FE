@@ -4,16 +4,14 @@ import {
   ArrowRight,
   CalendarDays,
   CircleAlert,
+  House,
   Filter,
   Layers,
   List,
   MapPin,
-  Sparkles,
-  Wand2,
   Moon,
   Search,
   Users,
-  Zap,
 } from "lucide-react";
 import {
   BUDGET_SLIDER,
@@ -30,6 +28,7 @@ import {
   nightsBetween,
 } from "../lib/format";
 import { searchCriteriaError, searchCriteriaKey } from "../lib/searchCriteria";
+import { parseItinerary } from "../lib/itinerary";
 import { useMeta } from "../hooks/useMeta";
 import { matchService } from "../services/matchService";
 import { requestService } from "../services/requestService";
@@ -288,11 +287,14 @@ function DiscoverBody({ meta }) {
             <label className="filter-label" htmlFor="search-home-city">
               Home city
             </label>
-            <div className="boxed">
-              <input
+            <div className="boxed with-icon">
+              <House size={18} />
+              <Dropdown
+                freeText
                 id="search-home-city"
-                type="text"
                 maxLength={100}
+                options={meta.homeCityOptions}
+                placeholder="e.g. Mumbai"
                 value={filters.homeCity}
                 onChange={(event) => set({ homeCity: event.target.value })}
               />
@@ -617,11 +619,11 @@ function MatchCard({ match, searchId, interestLabel }) {
       <div className="match-body">
         <div className="match-tags">
           <span className="tag-green">
-            <Zap size={14} fill="currentColor" /> {Math.round(match.score)}%
+            {Math.round(match.score)}%
             Match
           </span>
           <span className="tag-orange">
-            <Users size={14} /> {match.seatsLeft}{" "}
+            {match.seatsLeft}{" "}
             {match.seatsLeft === 1 ? "spot" : "spots"} left
           </span>
           {match.myRequestStatus && (
@@ -655,7 +657,7 @@ function MatchCard({ match, searchId, interestLabel }) {
           </span>
           <span>Hosted by {match.ownerName}</span>
         </div>
-        <p className="match-desc">{match.itinerary}</p>
+        <MatchItinerary text={match.itinerary} />
         <div className="match-interests">
           {match.interests.map((id) => (
             <span key={id}>{interestLabel(id)}</span>
@@ -672,6 +674,37 @@ function MatchCard({ match, searchId, interestLabel }) {
         </Link>
       </div>
     </article>
+  );
+}
+
+const PREVIEW_DAYS = 3;
+
+function MatchItinerary({ text }) {
+  const plan = parseItinerary(text);
+  const days = plan.days.slice(0, PREVIEW_DAYS);
+  return (
+    <div className="match-itinerary">
+      {plan.summary && <p className="match-desc">{plan.summary}</p>}
+      {days.length > 0 && (
+        <ul className="match-days">
+          {days.map((day) => (
+            <li key={day.number}>
+              <b>Day {day.number}</b>
+              <small>{day.date}</small>
+              <span>
+                {day.title && <strong>{day.title}</strong>}
+                {day.items.length
+                  ? day.items.map((item) => [item.time, item.text].filter(Boolean).join(" ")).join(" · ")
+                  : !day.title && "Free day"}
+              </span>
+            </li>
+          ))}
+          {plan.days.length > PREVIEW_DAYS && (
+            <li className="match-days-more">+{plan.days.length - PREVIEW_DAYS} more days</li>
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -720,9 +753,6 @@ function NearMisses({ groups, filters, onFix }) {
   return (
     <section className="near-miss">
       <header>
-        <span className="near-icon">
-          <Sparkles size={22} />
-        </span>
         <div>
           <h3>
             {fixable.length} more{" "}
@@ -759,7 +789,7 @@ function NearMisses({ groups, filters, onFix }) {
               className="fix-btn"
               onClick={() => onFix(fix.patch)}
             >
-              <Wand2 size={16} /> {fix.label}
+              {fix.label}
             </button>
           </article>
         ))}

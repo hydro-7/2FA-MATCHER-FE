@@ -8,9 +8,9 @@ export function Dropdown({ options = [], value = "", onChange, placeholder = "Ch
   const root = useRef(null);
   const listId = useId();
   const emit = (next) => onChange?.({ target: { value: next } });
-  const query = freeText ? value.trim().toLowerCase() : "";
-  const shown = query ? options.filter((option) => option.label.toLowerCase().includes(query) || option.id.toLowerCase().includes(query)) : options;
   const selected = options.find((option) => option.id === value);
+  const query = freeText && !selected ? value.trim().toLowerCase() : "";
+  const shown = query ? options.filter((option) => option.label.toLowerCase().includes(query) || option.id.toLowerCase().includes(query)) : options;
 
   useEffect(() => {
     if (!open) return;
